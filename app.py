@@ -3,6 +3,8 @@ from flask import Flask, request
 import telebot
 
 BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
+if not BOT_TOKEN:
+    raise ValueError("No BOT_TOKEN found. Set the BOT_TOKEN environment variable.")
 bot = telebot.TeleBot(BOT_TOKEN)
 
 app = Flask(__name__)
