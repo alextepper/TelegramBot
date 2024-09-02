@@ -38,5 +38,5 @@ def generate():
 if __name__ == "__main__":
     port = int(
         os.environ.get("PORT", 5000)
-    )  # Use the PORT environment variable or default to 5000
-    app.run(host="0.0.0.0", port=port)
+    )  # Use the PORT environment variable provided by Render
+    app.run(host="0.0.0.0", port=port)  # Bind to all interfaces with the specified port
