@@ -1,7 +1,8 @@
-import os
+# import os
 import pandas as pd
 import io
-import telebot
+
+# import telebot
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.units import cm
@@ -13,9 +14,9 @@ from reportlab.pdfbase.ttfonts import TTFont
 pdfmetrics.registerFont(TTFont("Poppins-Bold", "fonts/Poppins-Bold.ttf"))
 pdfmetrics.registerFont(TTFont("Poppins-Regular", "fonts/Poppins-Regular.ttf"))
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
+# BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
-bot = telebot.TeleBot(BOT_TOKEN)
+# bot = telebot.TeleBot(BOT_TOKEN)
 
 
 def process_csv(file):
@@ -118,30 +119,30 @@ def generate_pdf(dataframe):
     return pdf_file
 
 
-@bot.message_handler(commands=["start", "hello"])
-def send_welcome(message):
-    bot.reply_to(message, "Howdy, how are you doing?")
+# @bot.message_handler(commands=["start", "hello"])
+# def send_welcome(message):
+#     bot.reply_to(message, "Howdy, how are you doing?")
 
 
-@bot.message_handler(func=lambda msg: True)
-def echo_all(message):
-    bot.reply_to(message, message.text)
+# @bot.message_handler(func=lambda msg: True)
+# def echo_all(message):
+#     bot.reply_to(message, message.text)
 
 
-@bot.message_handler(content_types=["document"])
-def handle_document(message):
-    try:
-        file_info = bot.get_file(message.document.file_id)
-        file = bot.download_file(file_info.file_path)
-        dataframe = process_csv(file)
-        if dataframe is None:
-            bot.reply_to(message, "Failed to process CSV file.")
-            return
+# @bot.message_handler(content_types=["document"])
+# def handle_document(message):
+#     try:
+#         file_info = bot.get_file(message.document.file_id)
+#         file = bot.download_file(file_info.file_path)
+#         dataframe = process_csv(file)
+#         if dataframe is None:
+#             bot.reply_to(message, "Failed to process CSV file.")
+#             return
 
-        pdf = generate_pdf(dataframe)
-        bot.send_document(message.chat.id, pdf, visible_file_name="generated.pdf")
-    except Exception as e:
-        bot.reply_to(message, f"Error: {e}")
+#         pdf = generate_pdf(dataframe)
+#         bot.send_document(message.chat.id, pdf, visible_file_name="generated.pdf")
+#     except Exception as e:
+#         bot.reply_to(message, f"Error: {e}")
 
 
-bot.infinity_polling()
+# bot.infinity_polling()

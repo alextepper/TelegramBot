@@ -1,5 +1,4 @@
 from flask import Flask, request, send_file
-import io
 from bot import process_csv, generate_pdf  # Import your existing functions
 
 app = Flask(__name__)
@@ -11,7 +10,7 @@ def handle_csv():
     if not csv_data:
         return "No CSV data received", 400
 
-    dataframe = process_csv(csv_data.encode("utf-8"))
+    dataframe = process_csv(csv_data)
     if dataframe is None:
         return "Failed to process CSV", 400
 
