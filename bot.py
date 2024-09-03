@@ -45,7 +45,7 @@ def generate_pdf(dataframe):
         sole_thickness = row.get("Sole Thickness", "N/A")
         price = row.get("Price", "N/A")
         brand_logo = row.get("Brand")
-        vegan = row.get("Vegan", "No").upper()
+        vegan = row.get("Vegan", "No")
 
         print(f"Processing {model_name}, Vegan: {vegan}, Logo: {brand_logo}")
 
