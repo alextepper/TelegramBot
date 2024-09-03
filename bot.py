@@ -40,26 +40,28 @@ def generate_pdf(dataframe):
     y_start = width - cell_height - 1 * cm
 
     for index, row in dataframe.iterrows():
-        model_name = row.get("Model", "N/A")
-        color = row.get("Color", "N/A")
+        model_name = row.get("Model", "N/A").upper()
+        color = row.get("Color", "N/A").upper()
         sole_thickness = row.get("Sole Thickness", "N/A")
         price = row.get("Price", "N/A")
         brand_logo = row.get("Brand")
-        vegan = row.get("Vegan", "No")
+        vegan = row.get("Vegan", "No").upper()
 
         print(f"Processing {model_name}, Vegan: {vegan}, Logo: {brand_logo}")
 
+        # Draw cell border
         c.setStrokeColor(colors.black)
         c.rect(x_start, y_start, cell_width, cell_height, stroke=1, fill=0)
 
+        # Draw the brand logo on the left side with scaling
         if brand_logo:
             try:
                 max_logo_width = 4 * cm
                 max_logo_height = 3 * cm
                 c.drawImage(
                     brand_logo,
-                    x_start + 0.5 * cm,
-                    y_start + 0.5 * cm,
+                    x_start + 0.2 * cm,
+                    y_start + 0.2 * cm,
                     width=max_logo_width,
                     height=max_logo_height,
                     preserveAspectRatio=True,
@@ -68,40 +70,44 @@ def generate_pdf(dataframe):
             except Exception as e:
                 print(f"Error loading brand logo: {e}")
 
-        c.setFont("Helvetica-Bold", 36)
+        # Draw the model name at the top center using Poppins-Bold
+        c.setFont("Poppins-Bold", 36)
         model_name_position = x_start + cell_width / 2
         c.drawCentredString(
-            model_name_position, y_start + cell_height - 1.8 * cm, model_name
+            model_name_position, y_start + cell_height - 1.3 * cm, model_name
         )
 
-        if vegan in ["yes", "true", "1"]:
-            c.setFont("Helvetica-Bold", 36)
+        # Add vegan "V" icon in green if applicable, right after the model name
+        if vegan.lower() in ["yes", "true", "1"]:
+            c.setFont("Poppins-Bold", 36)
             c.setFillColor(colors.green)
             v_position = (
                 model_name_position
-                + c.stringWidth(model_name, "Helvetica-Bold", 36) / 2
+                + c.stringWidth(model_name, "Poppins-Bold", 36) / 2
                 + 10
             )
-            c.drawString(v_position, y_start + cell_height - 1.8 * cm, "V")
-            c.setFillColor(colors.black)
+            c.drawString(v_position, y_start + cell_height - 1.3 * cm, "V")
+            c.setFillColor(colors.black)  # Reset the color back to black
 
-        c.setFont("Helvetica", 26)
+        # Draw color and sole thickness at the bottom center using Poppins-Regular
+        c.setFont("Poppins-Regular", 26)
         c.drawCentredString(
             x_start + cell_width / 2,
-            y_start + 1 * cm,
+            y_start + 0.7 * cm,
             f"{color} | {sole_thickness}mm",
         )
 
-        c.setFont("Helvetica-Bold", 36)
+        # Draw the price on the right side of the cell using Poppins-Bold
+        c.setFont("Poppins-Regular", 26)
         c.drawRightString(
-            x_start + cell_width - 0.5 * cm, y_start + 1 * cm, f"${price}"
+            x_start + cell_width - 0.5 * cm, y_start + 0.7 * cm, f"{price}"
         )
 
-        x_start += cell_width
+        x_start += cell_width  # Add some space between cells
 
         if x_start + cell_width > height - 1 * cm:
             x_start = 1 * cm
-            y_start -= cell_height + 1 * cm
+            y_start -= cell_height + 1 * cm  # Move down for the next row
 
         if y_start < 1 * cm:
             c.showPage()
@@ -109,7 +115,7 @@ def generate_pdf(dataframe):
             y_start = width - cell_height - 1 * cm
 
     c.save()
-    pdf_file.seek(0)
+    pdf_file.seek(0)  # Rewind the file to the beginning
     return pdf_file
 
 
