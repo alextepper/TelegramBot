@@ -73,7 +73,9 @@ def generate_pdf(dataframe):
         else:
             # If logo does not exist, print the brand name as text
             c.setFont("Poppins-Bold", 15)
-            c.drawString(x_start + 0.5 * cm, y_start + cell_height, brand_name)
+            c.drawString(
+                x_start + 0.5 * cm, y_start + cell_height - 1.3 * cm, brand_name
+            )
 
         # Draw the model name at the top center using Poppins-Bold
         c.setFont("Poppins-Bold", 36)
@@ -117,7 +119,7 @@ def generate_pdf(dataframe):
         if y_start < 1 * cm:
             c.showPage()
             x_start = 1 * cm
-            y_start = width - cell_height
+            y_start = width - cell_height - 1 * cm
 
     c.save()
     pdf_file.seek(0)  # Rewind the file to the beginning
