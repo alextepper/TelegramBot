@@ -19,9 +19,9 @@ pdfmetrics.registerFont(TTFont("Poppins-Regular", "fonts/Poppins-Regular.ttf"))
 # bot = telebot.TeleBot(BOT_TOKEN)
 
 
-def process_csv(file):
+def process_csv(csv_data):
     try:
-        dataframe = pd.read_csv(io.StringIO(file.decode("utf-8")))
+        dataframe = pd.read_csv(io.StringIO(csv_data))
         return dataframe
     except Exception as e:
         print(f"Error processing CSV: {e}")
