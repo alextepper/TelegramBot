@@ -74,7 +74,7 @@ def generate_pdf(dataframe):
             model_name_position, y_start + cell_height - 1.8 * cm, model_name
         )
 
-        if vegan.lower() in ["yes", "true", "1"]:
+        if vegan in ["yes", "true", "1"]:
             c.setFont("Helvetica-Bold", 36)
             c.setFillColor(colors.green)
             v_position = (
