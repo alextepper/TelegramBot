@@ -1,28 +1,29 @@
-import os
-from flask import Flask, request
-import telebot
-
-BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
-if not BOT_TOKEN:
-    raise ValueError("No BOT_TOKEN found. Set the BOT_TOKEN environment variable.")
-bot = telebot.TeleBot(BOT_TOKEN)
+from flask import Flask, request, send_file
+import io
+from bot import process_csv, generate_pdf  # Import your existing functions
 
 app = Flask(__name__)
 
 
-@app.route("/" + BOT_TOKEN, methods=["POST"])
-def get_message():
-    json_str = request.get_data().decode("UTF-8")
-    update = telebot.types.Update.de_json(json_str)
-    bot.process_new_updates([update])
-    return "!", 200
+@app.route("/handle_csv", methods=["POST"])
+def handle_csv():
+    csv_data = request.form.get("data")
+    if not csv_data:
+        return "No CSV data received", 400
 
+    dataframe = process_csv(csv_data.encode("utf-8"))
+    if dataframe is None:
+        return "Failed to process CSV", 400
 
-@app.route("/", methods=["GET"])
-def index():
-    return "Hello, this is the bot server!", 200
+    pdf = generate_pdf(dataframe)
+
+    return send_file(
+        pdf,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="generated.pdf",
+    )
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=5000)
