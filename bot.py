@@ -40,12 +40,12 @@ def generate_pdf(dataframe):
     y_start = width - cell_height - 1 * cm
 
     for index, row in dataframe.iterrows():
-        model_name = row.get("Model", "N/A").upper()
-        color = row.get("Color", "N/A").upper()
-        sole_thickness = row.get("Sole Thickness", "N/A")
-        price = row.get("Price", "N/A")
-        brand_name = row.get("Brand")
-        vegan = row.get("Vegan", "No")
+        model_name = row.get("דגם", "N/A").upper()
+        color = row.get("צבע", "N/A").upper()
+        sole_thickness = row.get("עובי", "N/A")
+        price = row.get("מחיר", "N/A")
+        brand_name = row.get("מותג")
+        vegan = row.get("טבעוני", "No")
 
         # Construct the path to the brand logo
         brand_logo_path = f"{brand_name}.png" if brand_name else None
@@ -72,10 +72,8 @@ def generate_pdf(dataframe):
                 print(f"Error loading brand logo: {e}")
         else:
             # If logo does not exist, print the brand name as text
-            c.setFont("Poppins-Bold", 36)
-            c.drawString(
-                x_start + 0.5 * cm, y_start + cell_height - 1.5 * cm, brand_name
-            )
+            c.setFont("Poppins-Bold", 15)
+            c.drawString(x_start + 0.5 * cm, y_start + cell_height, brand_name)
 
         # Draw the model name at the top center using Poppins-Bold
         c.setFont("Poppins-Bold", 36)
@@ -114,12 +112,12 @@ def generate_pdf(dataframe):
 
         if x_start + cell_width > height - 1 * cm:
             x_start = 1 * cm
-            y_start -= cell_height + 1 * cm  # Move down for the next row
+            y_start -= cell_height  # Move down for the next row
 
         if y_start < 1 * cm:
             c.showPage()
             x_start = 1 * cm
-            y_start = width - cell_height - 1 * cm
+            y_start = width - cell_height
 
     c.save()
     pdf_file.seek(0)  # Rewind the file to the beginning
