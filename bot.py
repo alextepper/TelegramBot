@@ -85,7 +85,7 @@ def generate_pdf(dataframe):
         )
 
         # Add vegan "V" icon in green if applicable, right after the model name
-        if vegan in ["yes", "true", "1"]:
+        if vegan.lower() in ["yes", "true", "1"]:
             c.setFont("Poppins-Bold", 36)
             c.setFillColor(colors.green)
             v_position = (
