@@ -58,7 +58,7 @@ def generate_pdf(dataframe):
         if brand_logo_path and os.path.exists(brand_logo_path):
             try:
                 max_logo_width = 4 * cm
-                max_logo_height = 3 * cm
+                max_logo_height = 2.8 * cm
                 c.drawImage(
                     brand_logo_path,
                     x_start + 0.2 * cm,
@@ -70,6 +70,12 @@ def generate_pdf(dataframe):
                 )
             except Exception as e:
                 print(f"Error loading brand logo: {e}")
+        else:
+            # If logo does not exist, print the brand name as text
+            c.setFont("Poppins-Bold", 36)
+            c.drawString(
+                x_start + 0.5 * cm, y_start + cell_height - 1.5 * cm, brand_name
+            )
 
         # Draw the model name at the top center using Poppins-Bold
         c.setFont("Poppins-Bold", 36)
