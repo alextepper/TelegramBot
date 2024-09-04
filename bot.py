@@ -48,7 +48,7 @@ def generate_pdf(dataframe):
         vegan = row.get("טבעוני", "No")
 
         # Construct the path to the brand logo
-        brand_logo_path = f"{brand_name}.png" if brand_name else None
+        brand_logo_path = f"logos/{brand_name}.png" if brand_name else None
 
         # Draw cell border
         c.setStrokeColor(colors.black)
