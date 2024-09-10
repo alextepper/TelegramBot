@@ -85,16 +85,24 @@ def generate_pdf(dataframe):
         )
 
         # Add vegan "V" icon in green if applicable, right after the model name
-        if vegan in ["yes", "true", "1"]:
-            c.setFont("Poppins-Bold", 36)
-            c.setFillColor(colors.green)
-            v_position = (
-                model_name_position
-                + c.stringWidth(model_name, "Poppins-Bold", 36) / 2
-                + 10
-            )
-            c.drawString(v_position, y_start + cell_height - 1.3 * cm, "V")
-            c.setFillColor(colors.black)  # Reset the color back to black
+        if vegan.lower() in ["yes", "true", "1"]:
+            try:
+                vegan_icon_path = "VEGAN.png"  # Path to your VEGAN.png file
+                # Calculate the width of the model name
+                name_width = c.stringWidth(model_name, "Poppins-Bold", 36)
+                # Position the vegan icon after the model name
+                vegan_icon_x = model_name_position + name_width / 2 + 10
+                c.drawImage(
+                    vegan_icon_path,
+                    vegan_icon_x,
+                    y_start + cell_height - 2 * cm,
+                    width=2 * cm,  # Adjust icon size here
+                    height=2 * cm,
+                    preserveAspectRatio=True,
+                    mask="auto",
+                )
+            except Exception as e:
+                print(f"Error loading vegan icon: {e}")
 
         # Draw color and sole thickness at the bottom center using Poppins-Regular
         c.setFont("Poppins-Regular", 26)
