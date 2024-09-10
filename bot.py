@@ -85,7 +85,7 @@ def generate_pdf(dataframe):
         )
 
         # Add vegan "V" icon in green if applicable, right after the model name
-        if vegan.lower() in ["yes", "true", "1"]:
+        if vegan in ["yes", "true", "1"]:
             try:
                 vegan_icon_path = "VEGAN.png"  # Path to your VEGAN.png file
                 # Calculate the width of the model name
