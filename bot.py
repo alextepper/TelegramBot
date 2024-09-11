@@ -46,6 +46,7 @@ def generate_pdf(dataframe):
         price = str(row.get("מחיר", "N/A"))
         brand_name = str(row.get("מותג"))
         vegan = str(row.get("טבעוני", "No")).lower()
+        grounding = str(row.get("הארקה", "No")).lower()  # New grounding column
 
         # Construct the path to the brand logo
         brand_logo_path = f"logos1/{brand_name}.png" if brand_name else None
@@ -85,9 +86,10 @@ def generate_pdf(dataframe):
         )
 
         # Add vegan "V" icon in green if applicable, right after the model name
+        vegan_icon_x = None
         if vegan in ["yes", "true", "1"]:
             try:
-                vegan_icon_path = "logos1\VEGAN.png"  # Path to your VEGAN.png file
+                vegan_icon_path = "logos1/VEGAN.png"  # Path to your VEGAN.png file
                 # Calculate the width of the model name
                 name_width = c.stringWidth(model_name, "Poppins-Bold", 36)
                 # Position the vegan icon after the model name
@@ -103,6 +105,28 @@ def generate_pdf(dataframe):
                 )
             except Exception as e:
                 print(f"Error loading vegan icon: {e}")
+
+        # Add grounding icon next to the vegan icon if applicable
+        if grounding in ["yes", "true", "1"] and vegan_icon_x:
+            try:
+                grounding_icon_path = (
+                    "logos1/GROUNDING.png"  # Path to your GROUNDING.png file
+                )
+                # Position the grounding icon after the vegan icon
+                grounding_icon_x = (
+                    vegan_icon_x + 1.5 * cm
+                )  # Adjust the space between the two icons
+                c.drawImage(
+                    grounding_icon_path,
+                    grounding_icon_x,
+                    y_start + cell_height - 1.4 * cm,
+                    width=1.2 * cm,  # Adjust icon size here
+                    height=1.2 * cm,
+                    preserveAspectRatio=True,
+                    mask="auto",
+                )
+            except Exception as e:
+                print(f"Error loading grounding icon: {e}")
 
         # Draw color and sole thickness at the bottom center using Poppins-Regular
         c.setFont("Poppins-Regular", 26)
@@ -132,32 +156,3 @@ def generate_pdf(dataframe):
     c.save()
     pdf_file.seek(0)  # Rewind the file to the beginning
     return pdf_file
-
-
-# @bot.message_handler(commands=["start", "hello"])
-# def send_welcome(message):
-#     bot.reply_to(message, "Howdy, how are you doing?")
-
-
-# @bot.message_handler(func=lambda msg: True)
-# def echo_all(message):
-#     bot.reply_to(message, message.text)
-
-
-# @bot.message_handler(content_types=["document"])
-# def handle_document(message):
-#     try:
-#         file_info = bot.get_file(message.document.file_id)
-#         file = bot.download_file(file_info.file_path)
-#         dataframe = process_csv(file)
-#         if dataframe is None:
-#             bot.reply_to(message, "Failed to process CSV file.")
-#             return
-
-#         pdf = generate_pdf(dataframe)
-#         bot.send_document(message.chat.id, pdf, visible_file_name="generated.pdf")
-#     except Exception as e:
-#         bot.reply_to(message, f"Error: {e}")
-
-
-# bot.infinity_polling()
