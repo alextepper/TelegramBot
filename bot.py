@@ -40,12 +40,12 @@ def generate_pdf(dataframe):
     y_start = width - cell_height - 1 * cm
 
     for index, row in dataframe.iterrows():
-        model_name = row.get("דגם", "N/A").upper()
-        color = row.get("צבע", "N/A").upper()
-        sole_thickness = row.get("עובי", "N/A")
-        price = row.get("מחיר", "N/A")
-        brand_name = row.get("מותג")
-        vegan = row.get("טבעוני", "No")
+        model_name = str(row.get("דגם", "N/A")).upper()
+        color = str(row.get("צבע", "N/A")).upper()
+        sole_thickness = str(row.get("עובי", "N/A"))
+        price = str(row.get("מחיר", "N/A"))
+        brand_name = str(row.get("מותג"))
+        vegan = str(row.get("טבעוני", "No")).lower()
 
         # Construct the path to the brand logo
         brand_logo_path = f"logos1/{brand_name}.png" if brand_name else None
@@ -87,7 +87,7 @@ def generate_pdf(dataframe):
         # Add vegan "V" icon in green if applicable, right after the model name
         if vegan in ["yes", "true", "1"]:
             try:
-                vegan_icon_path = "VEGAN.png"  # Path to your VEGAN.png file
+                vegan_icon_path = "logos1\VEGAN.png"  # Path to your VEGAN.png file
                 # Calculate the width of the model name
                 name_width = c.stringWidth(model_name, "Poppins-Bold", 36)
                 # Position the vegan icon after the model name
@@ -95,9 +95,9 @@ def generate_pdf(dataframe):
                 c.drawImage(
                     vegan_icon_path,
                     vegan_icon_x,
-                    y_start + cell_height - 2 * cm,
-                    width=2 * cm,  # Adjust icon size here
-                    height=2 * cm,
+                    y_start + cell_height - 1.4 * cm,
+                    width=1.2 * cm,  # Adjust icon size here
+                    height=1.2 * cm,
                     preserveAspectRatio=True,
                     mask="auto",
                 )
@@ -113,7 +113,7 @@ def generate_pdf(dataframe):
         )
 
         # Draw the price on the right side of the cell using Poppins-Regular
-        c.setFont("Poppins-Regular", 26)
+        c.setFont("Poppins-Bold", 24)
         c.drawRightString(
             x_start + cell_width - 0.5 * cm, y_start + 0.7 * cm, f"{price}"
         )
