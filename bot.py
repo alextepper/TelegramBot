@@ -34,8 +34,8 @@ def generate_pdf(dataframe):
     width, height = A4
     c.setPageSize((height, width))
 
-    cell_width = 23.9 * cm
-    cell_height = 3.4 * cm
+    cell_width = 23.8 * cm
+    cell_height = 3.3 * cm
     x_start = 1 * cm
     y_start = width - cell_height - 1 * cm
 
@@ -79,7 +79,7 @@ def generate_pdf(dataframe):
             )
 
         # Draw the model name at the top center using Poppins-Bold
-        c.setFont("Poppins-Bold", 36)
+        c.setFont("Poppins-Bold", 32)
         model_name_position = x_start + cell_width / 2
         c.drawCentredString(
             model_name_position, y_start + cell_height - 1.3 * cm, model_name
@@ -151,7 +151,7 @@ def generate_pdf(dataframe):
         c.drawString(start_x + color_width, y_start + 0.7 * cm, thickness_text)
 
         # Draw the price on the right side of the cell using Poppins-Regular
-        c.setFont("Poppins-Bold", 24)
+        c.setFont("Poppins-Bold", 22)
         c.drawRightString(
             x_start + cell_width - 0.5 * cm, y_start + 0.7 * cm, f"{price}"
         )
