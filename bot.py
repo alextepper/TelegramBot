@@ -128,13 +128,27 @@ def generate_pdf(dataframe):
             except Exception as e:
                 print(f"Error loading grounding icon: {e}")
 
-        # Draw color and sole thickness at the bottom center using Poppins-Regular
-        c.setFont("Poppins-Regular", 26)
-        c.drawCentredString(
-            x_start + cell_width / 2,
-            y_start + 0.7 * cm,
-            f"{color} | {sole_thickness}mm",
-        )
+        # Calculate the total width of the color and sole thickness together
+        c.setFont("Poppins-Bold", 22)
+        color_width = c.stringWidth(f"{color}", "Poppins-Bold", 22)
+
+        c.setFont("Poppins-Regular", 22)
+        thickness_text = f" | {sole_thickness}mm"
+        thickness_width = c.stringWidth(thickness_text, "Poppins-Regular", 22)
+
+        # Total width of the combined text
+        total_text_width = color_width + thickness_width
+
+        # Calculate the starting point to center the combined text
+        start_x = x_start + (cell_width - total_text_width) / 2
+
+        # Draw the color in bold
+        c.setFont("Poppins-Bold", 22)
+        c.drawString(start_x, y_start + 0.7 * cm, f"{color}")
+
+        # Draw the sole thickness in regular right after the color
+        c.setFont("Poppins-Regular", 22)
+        c.drawString(start_x + color_width, y_start + 0.7 * cm, thickness_text)
 
         # Draw the price on the right side of the cell using Poppins-Regular
         c.setFont("Poppins-Bold", 24)
