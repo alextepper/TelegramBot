@@ -34,7 +34,7 @@ def generate_pdf(dataframe):
     width, height = A4
     c.setPageSize((height, width))
 
-    cell_width = 23.8 * cm
+    cell_width = 24.3 * cm
     cell_height = 3.3 * cm
     x_start = 1 * cm
     y_start = width - cell_height - 1 * cm
@@ -58,11 +58,11 @@ def generate_pdf(dataframe):
         # Draw the brand logo on the left side with scaling if the file exists
         if brand_logo_path and os.path.exists(brand_logo_path):
             try:
-                max_logo_width = 4 * cm
+                max_logo_width = 3.5 * cm
                 max_logo_height = 2.8 * cm
                 c.drawImage(
                     brand_logo_path,
-                    x_start + 0.2 * cm,
+                    x_start + 0.4 * cm,
                     y_start + 0.2 * cm,
                     width=max_logo_width,
                     height=max_logo_height,
