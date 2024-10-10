@@ -197,6 +197,7 @@ def generate_children_pdf(dataframe):
 
         # Draw cell border
         c.setStrokeColor(colors.black)
+        c.setDash(1, 3)
         c.rect(x_start, y_start, cell_width, cell_height, stroke=1, fill=0)
 
         # Draw the brand logo on the left side with scaling if the file exists
@@ -311,13 +312,13 @@ def generate_children_pdf(dataframe):
 
             # Adjust cell size and font size based on the number of valid size-price pairs
             if len(valid_size_prices) == 4:
-                table_y_start = y_start + cell_height - 0.55 * cm
+                table_y_start = y_start + cell_height - 0.65 * cm
                 font_size = 14
-                row_height = 0.725 * cm
+                row_height = 0.69 * cm
             elif len(valid_size_prices) == 3:
-                table_y_start = y_start + cell_height - 0.6 * cm
+                table_y_start = y_start + cell_height - 0.675 * cm
                 font_size = 16
-                row_height = 1 * cm
+                row_height = 0.95 * cm
             else:
                 table_y_start = y_start + cell_height - 1 * cm
                 font_size = 18
