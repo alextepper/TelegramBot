@@ -59,11 +59,11 @@ def generate_pdf(dataframe):
         if brand_logo_path and os.path.exists(brand_logo_path):
             try:
                 max_logo_width = 3.5 * cm
-                max_logo_height = 2.8 * cm
+                max_logo_height = 2.5 * cm
                 c.drawImage(
                     brand_logo_path,
                     x_start + 0.4 * cm,
-                    y_start + 0.2 * cm,
+                    y_start + 0.4 * cm,
                     width=max_logo_width,
                     height=max_logo_height,
                     preserveAspectRatio=True,
