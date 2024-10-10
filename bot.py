@@ -308,14 +308,20 @@ def generate_children_pdf(dataframe):
         if valid_size_prices:
             # Set table position on the right side of the cell
             table_x_start = x_start + cell_width - 5.5 * cm
-            table_y_start = y_start + cell_height - 1.2 * cm
 
             # Adjust cell size and font size based on the number of valid size-price pairs
-            if len(valid_size_prices) > 2:
-                font_size = 10
-                row_height = 0.7 * cm
+            if len(valid_size_prices) == 4:
+
+                table_y_start = y_start + cell_height - 0.55 * cm
+                font_size = 16
+                row_height = 0.725 * cm
+            elif len(valid_size_prices) == 3:
+                table_y_start = y_start + cell_height - 0.6 * cm
+                font_size = 20
+                row_height = 1 * cm
             else:
-                font_size = 14
+                table_y_start = y_start + cell_height - 1 * cm
+                font_size = 22
                 row_height = 1.2 * cm
 
             # Set stroke color and dash style for the table border
@@ -326,11 +332,21 @@ def generate_children_pdf(dataframe):
             for size_range, price_value in valid_size_prices:
                 # Set font size for size range
                 c.setFont("Poppins-Regular", font_size)
-                c.drawString(table_x_start, table_y_start, size_range)
+
+                # Calculate the vertical position to center the text within the row
+                text_height = (
+                    font_size * 0.3527
+                )  # Convert font size to points height (approximation)
+                vertical_center_y = table_y_start - (row_height - text_height) / 2
+
+                # Draw size range and price, centered vertically in the row
+                c.drawString(table_x_start, vertical_center_y, size_range)
 
                 # Set font size for price value
                 c.setFont("Poppins-Bold", font_size)
-                c.drawString(table_x_start + 3.5 * cm, table_y_start, f"{price_value}₪")
+                c.drawString(
+                    table_x_start + 3 * cm, vertical_center_y, f"{price_value}₪"
+                )
 
                 # Draw dotted rectangle around the table row
                 c.rect(
