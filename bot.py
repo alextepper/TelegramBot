@@ -10,9 +10,14 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+from utils import draw_price_tag, draw_discount_price_tag
+
 # Register the Poppins font
 pdfmetrics.registerFont(TTFont("Poppins-Bold", "fonts/Poppins-Bold.ttf"))
 pdfmetrics.registerFont(TTFont("Poppins-Regular", "fonts/Poppins-Regular.ttf"))
+pdfmetrics.registerFont(TTFont("Montserrat-Bold", "fonts/Montserrat-Bold.ttf"))
+pdfmetrics.registerFont(TTFont("Montserrat-SemiBold", "fonts/Montserrat-SemiBold.ttf"))
+pdfmetrics.registerFont(TTFont("Montserrat-Regular", "fonts/Montserrat-Regular.ttf"))
 
 # BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
@@ -40,30 +45,89 @@ def generate_pdf(dataframe):
     y_start = width - cell_height - 1 * cm
 
     for index, row in dataframe.iterrows():
+        # Set the stroke color to light grey
+        light_grey = colors.Color(0.85, 0.85, 0.85)  # RGB values for light grey
+        c.setStrokeColor(light_grey)
+
+        # Set the line style to dotted
+        c.setDash(1, 2)  # 1 unit on, 2 units off for a dotted line pattern
+
+        # Draw the cell border with the new settings
+        c.rect(x_start, y_start, cell_width, cell_height, stroke=1, fill=0)
+
+        # Reset the line settings for the rest of the content
+        c.setDash([])
+
+        discount = str(row.get("הנחה", "N/A"))
+        # Draw the price tag content
+        if discount == "nan":
+            draw_price_tag(c, x_start, y_start, cell_width, cell_height, row)
+        else:
+            draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row)
+
+        # Move to the next cell or next page if necessary
+        x_start += cell_width  # Move to the next cell
+        if (
+            x_start + cell_width > height - 1 * cm
+        ):  # Check if the next cell fits on the current row
+            x_start = 1 * cm
+            y_start -= cell_height + 1 * cm  # Move to the next row
+
+        if y_start < 1 * cm:  # Check if we need to move to the next page
+            c.showPage()
+            x_start = 1 * cm
+            y_start = width - cell_height - 1 * cm
+
+    c.save()
+    pdf_file.seek(0)  # Rewind the file to the beginning
+    return pdf_file
+
+
+def generate_discount_pdf(dataframe):
+    pdf_file = io.BytesIO()
+    c = canvas.Canvas(pdf_file, pagesize=A4)
+    width, height = A4
+    c.setPageSize((height, width))
+
+    cell_width = 24.3 * cm
+    cell_height = 3.3 * cm
+    x_start = 1 * cm
+    y_start = width - cell_height - 1 * cm
+
+    for index, row in dataframe.iterrows():
+        discount = str(row.get("הנחה", "N/A"))
         model_name = str(row.get("דגם", "N/A")).upper()
         color = str(row.get("צבע", "N/A")).upper()
         sole_thickness = str(row.get("עובי", "N/A"))
         price = str(row.get("מחיר", "N/A"))
         brand_name = str(row.get("מותג"))
-        vegan = str(row.get("טבעוני", "No")).lower()
-        grounding = str(row.get("הארקה", "No")).lower()  # New grounding column
 
-        # Construct the path to the brand logo
-        brand_logo_path = f"logos1/{brand_name}.png" if brand_name else None
+        # Set the stroke color to light grey
+        light_grey = colors.Color(0.85, 0.85, 0.85)  # RGB values for light grey
+        c.setStrokeColor(light_grey)
 
-        # Draw cell border
-        c.setStrokeColor(colors.black)
+        # Set the line style to dotted
+        c.setDash(1, 2)  # 1 unit on, 2 units off for a dotted line pattern
+
+        # Draw the cell border with the new settings
         c.rect(x_start, y_start, cell_width, cell_height, stroke=1, fill=0)
 
-        # Draw the brand logo on the left side with scaling if the file exists
+        # Draw the brand logo area (0 cm to 4.9 cm)
+        brand_logo_path = f"logos1/{brand_name}.png" if brand_name else None
         if brand_logo_path and os.path.exists(brand_logo_path):
             try:
-                max_logo_width = 3.5 * cm
-                max_logo_height = 2.5 * cm
+                max_logo_width = 4.2 * cm
+                max_logo_height = cell_height - 0.6 * cm
+                logo_x = (
+                    x_start + (4.9 * cm - max_logo_width) / 2
+                )  # Center horizontally
+                logo_y = (
+                    y_start + (cell_height - max_logo_height) / 2
+                )  # Center vertically
                 c.drawImage(
                     brand_logo_path,
-                    x_start + 0.4 * cm,
-                    y_start + 0.4 * cm,
+                    logo_x,
+                    logo_y,
                     width=max_logo_width,
                     height=max_logo_height,
                     preserveAspectRatio=True,
@@ -71,98 +135,124 @@ def generate_pdf(dataframe):
                 )
             except Exception as e:
                 print(f"Error loading brand logo: {e}")
+
+        background_path = "logos1/background.png"  # Path to your background image file
+        try:
+            background_x = x_start + 4.9 * cm
+            c.drawImage(
+                background_path,
+                background_x,
+                y_start,
+                width=cell_width - 4.9 * cm,  # Adjust width to fit the rest of the cell
+                height=cell_height,
+                preserveAspectRatio=False,
+                mask="auto",
+            )
+        except Exception as e:
+            print(f"Error loading background image: {e}")
+
+            # Draw the model name area starting from 5.6 cm
+            model_x_start = x_start + 5.6 * cm
+            c.setFont("Montserrat-Bold", 25)
+            c.setFillColorRGB(1, 1, 1)
+            # c.setFillColorRGB(0.67, 0.75, 0)  # Dark green color
+            c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
         else:
-            # If logo does not exist, print the brand name as text
-            c.setFont("Poppins-Bold", 15)
-            c.drawString(
-                x_start + 0.5 * cm, y_start + cell_height - 1.3 * cm, brand_name
+            line_x = x_start + 4.9 * cm
+            c.setDash([])
+            c.setStrokeColorCMYK(0.38, 0.04, 1.0, 0.0)
+            c.setLineWidth(1)
+            c.line(
+                line_x, y_start + 0.65 * cm, line_x, y_start + cell_height - 0.65 * cm
             )
 
-        # Draw the model name at the top center using Poppins-Bold
-        c.setFont("Poppins-Bold", 32)
-        model_name_position = x_start + cell_width / 2
-        c.drawCentredString(
-            model_name_position, y_start + cell_height - 1.3 * cm, model_name
+        # Draw a vertical bright green line at 4.9 cm
+
+        # Draw the model name area starting from 5.6 cm
+        model_x_start = x_start + 5.6 * cm
+        c.setFont("Montserrat-Bold", 25)
+        c.setFillColorRGB(67 / 255, 75 / 255, 49 / 255)
+        # c.setFillColorRGB(0.67, 0.75, 0)  # Dark green color
+        c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
+
+        # Draw the color and sole thickness below the model name
+        c.setFont("Montserrat-SemiBold", 18)
+        color_y_position = y_start + cell_height - 2.55 * cm
+        c.drawString(model_x_start, color_y_position, color)
+
+        # Draw the sole thickness next to the color
+        c.setFont("Montserrat-Regular", 18)
+        thickness_x = (
+            model_x_start + c.stringWidth(color, "Montserrat-SemiBold", 18) + 5
+        )
+        c.drawString(thickness_x + 0.25 * cm, color_y_position, f"{sole_thickness}mm")
+
+        price_x = x_start + 20.5 * cm
+        try:
+            formatted_price = f"{float(price):,.2f}"
+        except ValueError:
+            formatted_price = price  # Fallback to original if conversion fails
+
+        price_y_position = y_start + cell_height / 2
+
+        shekel_icon_path = "logos1/shekel.png"  # Path to your shekel symbol PNG file
+        shekel_icon_height = 0.35 * cm  # 4 mm height
+        shekel_icon_width = shekel_icon_height * 1.2  # Keep aspect ratio
+
+        font_size = 18
+        text_height = font_size * 0.6
+
+        price_text_width = c.stringWidth(
+            formatted_price, "Montserrat-SemiBold", font_size
         )
 
-        # Add vegan "V" icon in green if applicable, right after the model name
-        vegan_icon_x = None
-        if vegan in ["yes", "true", "1"]:
-            try:
-                vegan_icon_path = "logos1/VEGAN.png"  # Path to your VEGAN.png file
-                # Calculate the width of the model name
-                name_width = c.stringWidth(model_name, "Poppins-Bold", 36)
-                # Position the vegan icon after the model name
-                vegan_icon_x = model_name_position + name_width / 2 + 10
-                c.drawImage(
-                    vegan_icon_path,
-                    vegan_icon_x,
-                    y_start + cell_height - 1.4 * cm,
-                    width=1.2 * cm,  # Adjust icon size here
-                    height=1.2 * cm,
-                    preserveAspectRatio=True,
-                    mask="auto",
-                )
-            except Exception as e:
-                print(f"Error loading vegan icon: {e}")
+        try:
+            # Draw the shekel symbol PNG
+            c.drawImage(
+                shekel_icon_path,
+                price_x - price_text_width,
+                price_y_position - text_height / 2,  # Align vertically
+                width=shekel_icon_width,
+                height=shekel_icon_height,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
 
-        # Add grounding icon next to the vegan icon if applicable
-        if grounding in ["yes", "true", "1"] and vegan_icon_x:
-            try:
-                grounding_icon_path = (
-                    "logos1/GROUNDING.png"  # Path to your GROUNDING.png file
-                )
-                # Position the grounding icon after the vegan icon
-                grounding_icon_x = (
-                    vegan_icon_x + 1.5 * cm
-                )  # Adjust the space between the two icons
-                c.drawImage(
-                    grounding_icon_path,
-                    grounding_icon_x,
-                    y_start + cell_height - 1.4 * cm,
-                    width=1.2 * cm,  # Adjust icon size here
-                    height=1.2 * cm,
-                    preserveAspectRatio=True,
-                    mask="auto",
-                )
-            except Exception as e:
-                print(f"Error loading grounding icon: {e}")
+            # Draw the formatted price next to the shekel symbol
+            price_text_x = price_x + shekel_icon_width + 5  # Slight gap after icon
+            c.setFont("Montserrat-SemiBold", 18)
 
-        # Calculate the total width of the color and sole thickness together
-        c.setFont("Poppins-Bold", 22)
-        color_width = c.stringWidth(f"{color}", "Poppins-Bold", 22)
+            text_y_position = price_y_position - text_height / 2
+            c.drawRightString(price_text_x, text_y_position, formatted_price)
 
-        c.setFont("Poppins-Regular", 22)
-        thickness_text = f" | {sole_thickness}mm"
-        thickness_width = c.stringWidth(thickness_text, "Poppins-Regular", 22)
+        except Exception as e:
+            print(f"Error loading shekel icon: {e}")
 
-        # Total width of the combined text
-        total_text_width = color_width + thickness_width
+        # Draw the store logo at 21.7 cm (1.8 cm wide)
+        store_logo_path = "logos1/store_logo.png"  # Path to store logo
+        store_logo_x = x_start + 21.7 * cm
+        try:
+            c.drawImage(
+                store_logo_path,
+                store_logo_x,
+                y_start + (cell_height - 2.1 * cm) / 2,
+                width=2.1 * cm,
+                height=2.1 * cm,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+        except Exception as e:
+            print(f"Error loading store logo: {e}")
 
-        # Calculate the starting point to center the combined text
-        start_x = x_start + (cell_width - total_text_width) / 2
-
-        # Draw the color in bold
-        c.setFont("Poppins-Bold", 22)
-        c.drawString(start_x, y_start + 0.7 * cm, f"{color}")
-
-        # Draw the sole thickness in regular right after the color
-        c.setFont("Poppins-Regular", 22)
-        c.drawString(start_x + color_width, y_start + 0.7 * cm, thickness_text)
-
-        # Draw the price on the right side of the cell using Poppins-Regular
-        c.setFont("Poppins-Bold", 22)
-        c.drawRightString(
-            x_start + cell_width - 0.5 * cm, y_start + 0.7 * cm, f"{price}"
-        )
-
-        x_start += cell_width  # Add some space between cells
-
-        if x_start + cell_width > height - 1 * cm:
+        # Move to the next cell or next page if necessary
+        x_start += cell_width  # Move to the next cell
+        if (
+            x_start + cell_width > height - 1 * cm
+        ):  # Check if the next cell fits on the current row
             x_start = 1 * cm
-            y_start -= cell_height  # Move down for the next row
+            y_start -= cell_height + 1 * cm  # Move to the next row
 
-        if y_start < 1 * cm:
+        if y_start < 1 * cm:  # Check if we need to move to the next page
             c.showPage()
             x_start = 1 * cm
             y_start = width - cell_height - 1 * cm
