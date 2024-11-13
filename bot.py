@@ -10,7 +10,12 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-from utils import draw_price_tag, draw_discount_price_tag
+from utils import (
+    draw_kids_discount_price_tag,
+    draw_kids_price_tag,
+    draw_price_tag,
+    draw_discount_price_tag,
+)
 
 # Register the Poppins font
 pdfmetrics.registerFont(TTFont("Poppins-Bold", "fonts/Poppins-Bold.ttf"))
@@ -64,6 +69,58 @@ def generate_pdf(dataframe):
             draw_price_tag(c, x_start, y_start, cell_width, cell_height, row)
         else:
             draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row)
+
+        # Move to the next cell or next page if necessary
+        x_start += cell_width  # Move to the next cell
+        if (
+            x_start + cell_width > height - 1 * cm
+        ):  # Check if the next cell fits on the current row
+            x_start = 1 * cm
+            y_start -= cell_height + 1 * cm  # Move to the next row
+
+        if y_start < 1 * cm:  # Check if we need to move to the next page
+            c.showPage()
+            x_start = 1 * cm
+            y_start = width - cell_height - 1 * cm
+
+    c.save()
+    pdf_file.seek(0)  # Rewind the file to the beginning
+    return pdf_file
+
+
+def generate_kids_pdf(dataframe):
+    pdf_file = io.BytesIO()
+    c = canvas.Canvas(pdf_file, pagesize=A4)
+    width, height = A4
+    c.setPageSize((height, width))
+
+    cell_width = 24.3 * cm
+    cell_height = 3.3 * cm
+    x_start = 1 * cm
+    y_start = width - cell_height - 1 * cm
+
+    for index, row in dataframe.iterrows():
+        # Set the stroke color to light grey
+        light_grey = colors.Color(0.85, 0.85, 0.85)  # RGB values for light grey
+        c.setStrokeColor(light_grey)
+
+        # Set the line style to dotted
+        c.setDash(1, 2)  # 1 unit on, 2 units off for a dotted line pattern
+
+        # Draw the cell border with the new settings
+        c.rect(x_start, y_start, cell_width, cell_height, stroke=1, fill=0)
+
+        # Reset the line settings for the rest of the content
+        c.setDash([])
+
+        discount = str(row.get("הנחה", "N/A"))
+        # Draw the price tag content
+        if discount == "N/A":
+            draw_kids_price_tag(c, x_start, y_start, cell_width, cell_height, row)
+        else:
+            draw_kids_discount_price_tag(
+                c, x_start, y_start, cell_width, cell_height, row
+            )
 
         # Move to the next cell or next page if necessary
         x_start += cell_width  # Move to the next cell
