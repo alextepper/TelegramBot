@@ -37,6 +37,8 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     brand_name = str(row.get("מותג"))
 
     sole_thickness_value = row.get("עובי", "N/A")
+    vegan = str(row.get("טבעוני", "N/A")).upper()
+    grounding = str(row.get("הארקה", "N/A")).upper()
 
     try:
         # Convert the sole thickness to a float and format it with one digit after the dot
@@ -77,6 +79,38 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     c.setFont("Montserrat-Bold", 25)
     c.setFillColorRGB(67 / 255, 75 / 255, 49 / 255)  # Dark green color
     c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
+
+    if vegan == "YES":
+        vegan_path = "logos1/vegan.png"  # Path to store logo
+        vegan_x = x_start + 13.7 * cm
+        try:
+            c.drawImage(
+                vegan_path,
+                vegan_x,
+                y_start + cell_height - 1.4 * cm,
+                width=2.1 * cm,
+                height=0.62 * cm,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+        except Exception as e:
+            print(f"Error loading store logo: {e}")
+
+    if grounding == "YES":
+        grounding_path = "logos1/grounding.png"  # Path to store logo
+        grounding_x = x_start + 14.7 * cm
+        try:
+            c.drawImage(
+                grounding_path,
+                grounding_x,
+                y_start + cell_height - 1.4 * cm,
+                width=2.1 * cm,
+                height=0.62 * cm,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+        except Exception as e:
+            print(f"Error loading store logo: {e}")
 
     # Draw the color and sole thickness below the model name
     c.setFont("Montserrat-SemiBold", 18)
@@ -210,6 +244,36 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     c.setFont("Montserrat-Bold", 25)
     c.setFillColorRGB(1, 1, 1)
     c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
+
+    vegan_path = "logos1/vegan_white.png"  # Path to store logo
+    vegan_x = x_start + 13.7 * cm
+    try:
+        c.drawImage(
+            vegan_path,
+            vegan_x,
+            y_start + cell_height - 1.4 * cm,
+            width=2.1 * cm,
+            height=0.62 * cm,
+            preserveAspectRatio=True,
+            mask="auto",
+        )
+    except Exception as e:
+        print(f"Error loading store logo: {e}")
+
+    grounding_path = "logos1/grounding_white.png"  # Path to store logo
+    grounding_x = x_start + 14.7 * cm
+    try:
+        c.drawImage(
+            grounding_path,
+            grounding_x,
+            y_start + cell_height - 1.4 * cm,
+            width=2.1 * cm,
+            height=0.62 * cm,
+            preserveAspectRatio=True,
+            mask="auto",
+        )
+    except Exception as e:
+        print(f"Error loading store logo: {e}")
 
     # Draw the "SALE -30%" text to the right of the model name
     sale_text_x_start = (
