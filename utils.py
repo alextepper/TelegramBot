@@ -133,7 +133,7 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
 
     # Draw the vegan icon if applicable
     if vegan == "YES":
-        vegan_path = "logos1/vegan.png"  # Path to vegan logo
+        vegan_path = "logos1/VEGAN.png"  # Path to vegan logo
         try:
             c.drawImage(
                 vegan_path,
@@ -152,7 +152,7 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
 
     # Draw the grounding icon if applicable
     if grounding == "YES":
-        grounding_path = "logos1/grounding.png"  # Path to grounding logo
+        grounding_path = "logos1/GROUNDING.png"  # Path to grounding logo
         try:
             c.drawImage(
                 grounding_path,
@@ -270,7 +270,7 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
             print(f"Error loading brand logo: {e}")
 
     # Draw the background starting from 4.9 cm
-    background_path = "logos1/background.png"  # Path to your background image file
+    background_path = "logos1/BACKGROUND.png"  # Path to your background image file
     try:
         background_x = x_start + 4.6 * cm
         c.drawImage(
@@ -396,7 +396,7 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
         except Exception as e:
             print(f"Error loading grounding icon: {e}")
 
-    brush_path = "logos1/brush.png"  # Path to your background image file
+    brush_path = "logos1/BRUSH.png"  # Path to your background image file
     try:
         brush_x = x_start + 21.12 * cm
         c.drawImage(
