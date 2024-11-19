@@ -39,7 +39,7 @@ def handle_csv_children():
     if dataframe is None:
         return "Failed to process CSV", 400
 
-    pdf = generate_children_pdf(dataframe)
+    pdf = generate_kids_pdf(dataframe)
 
     return send_file(
         pdf,
