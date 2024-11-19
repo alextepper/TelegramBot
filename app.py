@@ -1,6 +1,7 @@
 from flask import Flask, request, send_file
 from bot import (
     generate_children_pdf,
+    generate_kids_pdf,
     process_csv,
     generate_pdf,
 )  # Import your existing functions
@@ -38,7 +39,7 @@ def handle_csv_children():
     if dataframe is None:
         return "Failed to process CSV", 400
 
-    pdf = generate_children_pdf(dataframe)
+    pdf = generate_kids_pdf(dataframe)
 
     return send_file(
         pdf,
