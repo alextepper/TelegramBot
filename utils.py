@@ -80,40 +80,6 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     c.setFillColorRGB(67 / 255, 75 / 255, 49 / 255)  # Dark green color
     c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
 
-    # if vegan == "YES":
-    #     vegan_path = "logos1/vegan.png"  # Path to store logo
-    #     vegan_x = x_start + 13.7 * cm
-    #     try:
-    #         c.drawImage(
-    #             vegan_path,
-    #             vegan_x,
-    #             y_start + cell_height - 1.4 * cm,
-    #             width=2.1 * cm,
-    #             height=0.62 * cm,
-    #             preserveAspectRatio=True,
-    #             mask="auto",
-    #         )
-    #     except Exception as e:
-    #         print(f"Error loading store logo: {e}")
-
-    # if grounding == "YES":
-    #     grounding_path = "logos1/grounding.png"  # Path to store logo
-    #     grounding_x = x_start + 14.7 * cm
-    #     try:
-    #         c.drawImage(
-    #             grounding_path,
-    #             grounding_x,
-    #             y_start + cell_height - 1.4 * cm,
-    #             width=2.1 * cm,
-    #             height=0.62 * cm,
-    #             preserveAspectRatio=True,
-    #             mask="auto",
-    #         )
-    #     except Exception as e:
-    #         print(f"Error loading store logo: {e}")
-
-    # Draw the color and sole thickness below the model name
-
     c.setFont("Montserrat-SemiBold", 18)
     color_y_position = y_start + cell_height - 2.55 * cm
     c.drawString(model_x_start, color_y_position, color)
@@ -133,19 +99,21 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
 
     # Draw the vegan icon if applicable
     if vegan == "YES":
+        # vegan_string = "המוצר אינו מכיל חומרים מהחי, אולם לא עבר בדיקת מעבדה לקבלת תו תקן טבעוני רשמי"
         vegan_path = "logos1/VEGAN.png"  # Path to vegan logo
+        c.setFont("Montserrat-Regular", 18)
         try:
             c.drawImage(
                 vegan_path,
                 current_x_position,
                 color_y_position,  # Align vertically (slightly below the text)
                 width=2.1 * cm,
-                height=0.6 * cm,
+                height=0.75 * cm,
                 preserveAspectRatio=True,
                 mask="auto",
             )
             current_x_position += (
-                0.66 * cm + 0.2 * cm
+                0.66 * cm + 0.4 * cm
             )  # Update the position for the next icon
         except Exception as e:
             print(f"Error loading vegan icon: {e}")
@@ -159,7 +127,7 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
                 current_x_position,
                 color_y_position,  # Align vertically (slightly below the text)
                 width=2.1 * cm,
-                height=0.6 * cm,
+                height=0.75 * cm,
                 preserveAspectRatio=True,
                 mask="auto",
             )
@@ -167,7 +135,7 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
             print(f"Error loading grounding icon: {e}")
 
     # Draw the price
-    price_x = x_start + 20.5 * cm
+    price_x = x_start + 21 * cm
     try:
         formatted_price = f"{float(price):,.2f}"
     except ValueError:
@@ -189,7 +157,7 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
         c.drawImage(
             shekel_icon_path,
             price_x - price_text_width,
-            price_y_position - text_height / 2,  # Align vertically
+            color_y_position,  # Align vertically
             width=shekel_icon_width,
             height=shekel_icon_height,
             preserveAspectRatio=True,
@@ -200,7 +168,7 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
         price_text_x = price_x + shekel_icon_width + 5  # Slight gap after icon
         c.setFont("Montserrat-SemiBold", 18)
         text_y_position = price_y_position - text_height / 2
-        c.drawRightString(price_text_x, text_y_position, formatted_price)
+        c.drawRightString(price_text_x, color_y_position, formatted_price)
 
     except Exception as e:
         print(f"Error loading shekel icon: {e}")
@@ -291,36 +259,6 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     c.setFillColorRGB(1, 1, 1)
     c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
 
-    # vegan_path = "logos1/vegan_white.png"  # Path to store logo
-    # vegan_x = x_start + 13.7 * cm
-    # try:
-    #     c.drawImage(
-    #         vegan_path,
-    #         vegan_x,
-    #         y_start + cell_height - 1.4 * cm,
-    #         width=2.1 * cm,
-    #         height=0.62 * cm,
-    #         preserveAspectRatio=True,
-    #         mask="auto",
-    #     )
-    # except Exception as e:
-    #     print(f"Error loading store logo: {e}")
-
-    # grounding_path = "logos1/grounding_white.png"  # Path to store logo
-    # grounding_x = x_start + 14.7 * cm
-    # try:
-    #     c.drawImage(
-    #         grounding_path,
-    #         grounding_x,
-    #         y_start + cell_height - 1.4 * cm,
-    #         width=2.1 * cm,
-    #         height=0.62 * cm,
-    #         preserveAspectRatio=True,
-    #         mask="auto",
-    #     )
-    # except Exception as e:
-    #     print(f"Error loading store logo: {e}")
-
     # Draw the "SALE -30%" text to the right of the model name
     sale_text_x_start = (
         model_x_start + c.stringWidth(f"-{discount}%", "Montserrat-Bold", 25) + 15
@@ -332,14 +270,14 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     # Draw "SALE" with Montserrat Medium, white color
     c.setFont("Montserrat-Medium", 25)
     c.setFillColorRGB(1, 1, 1)
-    c.drawRightString(21.95 * cm - discount_text_width, sale_y_position, "SALE")
+    c.drawRightString(22.45 * cm - discount_text_width, sale_y_position, "SALE")
 
     # Draw "-30%" with Montserrat Bold, green color
     c.setFont("Montserrat-Bold", 25)
     c.setFillColorCMYK(
         0.38, 0.04, 1.0, 0.0
     )  # Bright green color (c=38, m=4, y=100, k=0)
-    c.drawRightString(x_start + 21.1 * cm, sale_y_position, f"-{discount}%")
+    c.drawRightString(x_start + 21.6 * cm, sale_y_position, f"-{discount}%")
 
     # Draw the color and sole thickness below the model name
 
@@ -370,12 +308,12 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
                 current_x_position,
                 color_y_position,  # Align vertically (slightly below the text)
                 width=2.1 * cm,
-                height=0.6 * cm,
+                height=0.75 * cm,
                 preserveAspectRatio=True,
                 mask="auto",
             )
             current_x_position += (
-                0.66 * cm + 0.2 * cm
+                0.66 * cm + 0.4 * cm
             )  # Update the position for the next icon
         except Exception as e:
             print(f"Error loading vegan icon: {e}")
@@ -389,7 +327,7 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
                 current_x_position,
                 color_y_position,  # Align vertically (slightly below the text)
                 width=2.1 * cm,
-                height=0.6 * cm,
+                height=0.75 * cm,
                 preserveAspectRatio=True,
                 mask="auto",
             )
@@ -398,7 +336,7 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
 
     brush_path = "logos1/BRUSH.png"  # Path to your background image file
     try:
-        brush_x = x_start + 21.12 * cm
+        brush_x = x_start + 21.62 * cm
         c.drawImage(
             brush_path,
             brush_x,
@@ -412,7 +350,7 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
         print(f"Error loading background image: {e}")
 
     # Draw the price at the right position, aligned with the color
-    price_x = x_start + 20.5 * cm
+    price_x = x_start + 21 * cm
     try:
         formatted_price = f"{float(price):,.2f}"
     except ValueError:
@@ -535,7 +473,7 @@ def draw_kids_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
 
     # if vegan == "YES":
-    #     vegan_path = "logos1/vegan.png"  # Path to store logo
+    #     vegan_path = "logos1/VEGAN.png"  # Path to store logo
     #     vegan_x = x_start + 13.7 * cm
     #     try:
     #         c.drawImage(
@@ -588,19 +526,19 @@ def draw_kids_price_tag(c, x_start, y_start, cell_width, cell_height, row):
 
     # Draw the vegan icon if applicable
     if vegan == "YES":
-        vegan_path = "logos1/vegan.png"  # Path to vegan logo
+        vegan_path = "logos1/VEGAN.png"  # Path to vegan logo
         try:
             c.drawImage(
                 vegan_path,
                 current_x_position,
                 color_y_position,  # Align vertically (slightly below the text)
                 width=2.1 * cm,
-                height=0.6 * cm,
+                height=0.75 * cm,
                 preserveAspectRatio=True,
                 mask="auto",
             )
             current_x_position += (
-                0.66 * cm + 0.2 * cm
+                0.66 * cm + 0.4 * cm
             )  # Update the position for the next icon
         except Exception as e:
             print(f"Error loading vegan icon: {e}")
@@ -614,7 +552,7 @@ def draw_kids_price_tag(c, x_start, y_start, cell_width, cell_height, row):
                 current_x_position,
                 color_y_position,  # Align vertically (slightly below the text)
                 width=2.1 * cm,
-                height=0.6 * cm,
+                height=0.75 * cm,
                 preserveAspectRatio=True,
                 mask="auto",
             )
@@ -776,7 +714,7 @@ def draw_kids_discount_price_tag(c, x_start, y_start, cell_width, cell_height, r
     c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
 
     if vegan == "YES":
-        vegan_path = "logos1/vegan.png"  # Path to store logo
+        vegan_path = "logos1/VEGAN.png"  # Path to store logo
         vegan_x = x_start + 13.7 * cm
         try:
             c.drawImage(
