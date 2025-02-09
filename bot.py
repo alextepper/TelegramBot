@@ -51,7 +51,7 @@ def generate_pdf(dataframe):
 
     for index, row in dataframe.iterrows():
         # Set the stroke color to light grey
-        light_grey = colors.Color(0.85, 0.85, 0.85)  # RGB values for light grey
+        light_grey = colors.Color(1, 1, 1)  # RGB values for light grey
         c.setStrokeColor(light_grey)
 
         # Set the line style to dotted
