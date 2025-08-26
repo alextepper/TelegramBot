@@ -47,7 +47,7 @@ def generate_pdf(dataframe):
     cell_width = 24.3 * cm
     cell_height = 3.3 * cm
     x_start = 1 * cm
-    y_start = width - cell_height * cm
+    y_start = width - cell_height - 1 * cm
 
     for index, row in dataframe.iterrows():
         # Set the stroke color to light grey
