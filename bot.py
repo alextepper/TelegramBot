@@ -76,7 +76,7 @@ def generate_pdf(dataframe):
             x_start + cell_width > height - 1 * cm
         ):  # Check if the next cell fits on the current row
             x_start = 1 * cm
-            y_start -= cell_height + 0.5 * cm  # Move to the next row
+            y_start -= cell_height  # Move to the next row with no extra spacing
 
         if y_start < 1 * cm:  # Check if we need to move to the next page
             c.showPage()
@@ -128,7 +128,7 @@ def generate_kids_pdf(dataframe):
             x_start + cell_width > height - 1 * cm
         ):  # Check if the next cell fits on the current row
             x_start = 1 * cm
-            y_start -= cell_height + 1 * cm  # Move to the next row
+            y_start -= cell_height  # Move to the next row with no extra spacing
 
         if y_start < 1 * cm:  # Check if we need to move to the next page
             c.showPage()
@@ -346,7 +346,7 @@ def generate_children_pdf(dataframe):
             x_start + cell_width > height - 1 * cm
         ):  # Check if the next cell fits on the current row
             x_start = 1 * cm
-            y_start -= cell_height + 1 * cm  # Move to the next row
+            y_start -= cell_height  # Move to the next row with no extra spacing
 
         if y_start < 1 * cm:  # Check if we need to move to the next page
             c.showPage()
