@@ -38,6 +38,61 @@ def process_csv(csv_data):
         return None
 
 
+def convert_csv_format(dataframe):
+    """Convert the new CSV format to the Hebrew format expected by the existing functions."""
+    import json
+
+    converted_data = []
+
+    for index, row in dataframe.iterrows():
+        converted_row = {}
+
+        # Map basic fields
+        converted_row["דגם"] = row.get("printTitle", "N/A")
+        converted_row["מותג"] = row.get("make", "N/A")
+        converted_row["צבע"] = row.get("color", "N/A")
+        converted_row["עובי"] = row.get("thickness", "N/A")
+
+        # Map boolean flags
+        is_vegan = str(row.get("isVegan", "false")).lower()
+        converted_row["טבעוני"] = "YES" if is_vegan in ["true", "yes", "1"] else "NO"
+
+        is_grounded = str(row.get("isGrounded", "false")).lower()
+        converted_row["הארקה"] = "YES" if is_grounded in ["true", "yes", "1"] else "NO"
+
+        # Handle discount
+        discount = str(row.get("discount", ""))
+        if discount and discount != "nan" and discount != "":
+            # Remove % sign if present
+            discount_clean = discount.replace("%", "")
+            converted_row["הנחה"] = discount_clean
+        else:
+            converted_row["הנחה"] = "nan"
+
+        # Handle price - could be regular price or JSON array for size ranges
+        price = str(row.get("price", ""))
+        is_kids = str(row.get("isKids", "false")).lower() in ["true", "yes", "1"]
+
+        # Check if price is a JSON array (for size ranges)
+        try:
+            price_data = json.loads(price)
+            if isinstance(price_data, list):
+                # It's size ranges (for children)
+                for i, item in enumerate(price_data[:4], 1):  # Max 4 size ranges
+                    converted_row[f"מידות{i}"] = item.get("sizeRange", "")
+                    converted_row[f"מחיר{i}"] = item.get("price", "")
+            else:
+                # Single price
+                converted_row["מחיר"] = price
+        except (json.JSONDecodeError, ValueError, TypeError):
+            # Not JSON, it's a regular price
+            converted_row["מחיר"] = price
+
+        converted_data.append(converted_row)
+
+    return pd.DataFrame(converted_data)
+
+
 def generate_pdf(dataframe):
     pdf_file = io.BytesIO()
     c = canvas.Canvas(pdf_file, pagesize=A4)
@@ -339,6 +394,67 @@ def generate_children_pdf(dataframe):
 
                 # Move down for the next row
                 table_y_start -= row_height
+
+        # Move to the next cell or next page if necessary
+        x_start += cell_width  # Move to the next cell
+        if (
+            x_start + cell_width > height - 1 * cm
+        ):  # Check if the next cell fits on the current row
+            x_start = 1 * cm
+            y_start -= cell_height  # Move to the next row with no extra spacing
+
+        if y_start < 1 * cm:  # Check if we need to move to the next page
+            c.showPage()
+            x_start = 1 * cm
+            y_start = width - cell_height - 1 * cm
+
+    c.save()
+    pdf_file.seek(0)  # Rewind the file to the beginning
+    return pdf_file
+
+
+def generate_mixed_pdf(rows):
+    pdf_file = io.BytesIO()
+    c = canvas.Canvas(pdf_file, pagesize=A4)
+    width, height = A4
+    c.setPageSize((height, width))
+
+    cell_width = 24.3 * cm
+    cell_height = 3.3 * cm
+    x_start = 1 * cm
+    y_start = width - cell_height - 1 * cm
+
+    for row in rows:
+        # Set the stroke color to light grey
+        light_grey = colors.Color(0.85, 0.85, 0.85)  # RGB values for light grey
+        c.setStrokeColor(light_grey)
+
+        # Set the line style to dotted
+        c.setDash(1, 2)  # 1 unit on, 2 units off for a dotted line pattern
+
+        # Draw the cell border with the new settings
+        c.rect(x_start, y_start, cell_width, cell_height, stroke=1, fill=0)
+
+        # Reset the line settings for the rest of the content
+        c.setDash([])
+
+        is_kids = str(row.get("ילדים", "NO")).strip().lower() in ["yes", "true", "1"]
+        if is_kids:
+            discount = str(row.get("הנחה", "N/A"))
+            if discount == "N/A":
+                draw_kids_price_tag(c, x_start, y_start, cell_width, cell_height, row)
+            else:
+                draw_kids_discount_price_tag(
+                    c, x_start, y_start, cell_width, cell_height, row
+                )
+        else:
+            discount = str(row.get("הנחה", "nan"))
+            if discount == "nan":
+                draw_price_tag(c, x_start, y_start, cell_width, cell_height, row)
+            else:
+                draw_discount_price_tag(
+                    c, x_start, y_start, cell_width, cell_height, row
+                )
 
         # Move to the next cell or next page if necessary
         x_start += cell_width  # Move to the next cell

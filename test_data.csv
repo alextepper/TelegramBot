@@ -1,0 +1,5 @@
+printTitle,make,color,thickness,isVegan,isGrounded,isKids,price,discount
+"Regular Cat","ADAMA","blue","8mm","true","false","false","299.9","10"
+"Kids Cat","VIVOBAREFOOT","red","4mm","false","true","true","[{""sizeRange"":""20-26"",""price"":""299.9""},{""sizeRange"":""27-32"",""price"":""359.9""}]","15"
+"Adult Flip Flop","LEMS","green","3mm","true","false","false","399.9","5"
+
