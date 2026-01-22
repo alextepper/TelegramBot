@@ -1,4 +1,5 @@
 from flask import Flask, request, send_file
+from flask_cors import CORS
 import pandas as pd
 from bot import (
     generate_children_pdf,
@@ -10,6 +11,7 @@ from bot import (
 )  # Import your existing functions
 
 app = Flask(__name__)
+CORS(app)
 
 
 def _normalize_bool(value):
