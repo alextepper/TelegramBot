@@ -87,9 +87,12 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     # Draw the sole thickness next to the color
     c.setFont("Montserrat-Regular", 18)
     thickness_x = model_x_start + c.stringWidth(color, "Montserrat-SemiBold", 18) + 5
-    formatted_thickness = (
-        f"{float(sole_thickness):.1f}mm"  # Ensure one digit after the dot
-    )
+    try:
+        formatted_thickness = (
+            f"{float(sole_thickness):.1f}mm"  # Ensure one digit after the dot
+        )
+    except (ValueError, TypeError):
+        formatted_thickness = "N/A"
     c.drawString(thickness_x + 0.25 * cm, color_y_position, formatted_thickness)
 
     # Calculate the x-position after the sole thickness for the icons
