@@ -25,8 +25,30 @@ def _normalize_str(value, default="N/A"):
     return text if text.strip() != "" else default
 
 
+def _get_first_value(item, keys, default=None):
+    for key in keys:
+        if key in item and item.get(key) not in (None, ""):
+            return item.get(key)
+    return default
+
+
 def _parse_kids_price_ranges(price_value):
     if price_value is None:
+        return []
+    if isinstance(price_value, list):
+        size_prices = []
+        for item in price_value:
+            if not isinstance(item, dict):
+                continue
+            size_range = _normalize_str(item.get("sizeRange"), default="")
+            price = _normalize_str(item.get("price"), default="")
+            if size_range and price:
+                size_prices.append((size_range, price))
+        return size_prices
+    if isinstance(price_value, dict):
+        ranges = price_value.get("ranges")
+        if isinstance(ranges, list):
+            return _parse_kids_price_ranges(ranges)
         return []
     if isinstance(price_value, (int, float)):
         return []
@@ -50,16 +72,28 @@ def _build_rows_from_items(items):
             continue
 
         base_row = {
-            "דגם": _normalize_str(item.get("דגם")),
-            "מותג": _normalize_str(item.get("מותג")),
-            "צבע": _normalize_str(item.get("צבע")),
-            "עובי": _normalize_str(item.get("עובי")),
-            "טבעוני": _normalize_str(item.get("טבעוני"), default="NO"),
-            "הארקה": _normalize_str(item.get("הארקה"), default="NO"),
+            "דגם": _normalize_str(
+                _get_first_value(item, ["דגם", "printTitle", "title"])
+            ),
+            "מותג": _normalize_str(_get_first_value(item, ["מותג", "make"])),
+            "צבע": _normalize_str(_get_first_value(item, ["צבע", "color"])),
+            "עובי": _normalize_str(_get_first_value(item, ["עובי", "thickness"])),
+            "טבעוני": (
+                "YES"
+                if _normalize_bool(_get_first_value(item, ["טבעוני", "isVegan"], False))
+                else "NO"
+            ),
+            "הארקה": (
+                "YES"
+                if _normalize_bool(
+                    _get_first_value(item, ["הארקה", "isGrounded"], False)
+                )
+                else "NO"
+            ),
         }
 
-        is_kids = _normalize_bool(item.get("ילדים", "NO"))
-        discount_value = item.get("הנחה")
+        is_kids = _normalize_bool(_get_first_value(item, ["ילדים", "isKids"], "NO"))
+        discount_value = _get_first_value(item, ["הנחה", "discount"])
 
         if is_kids:
             row = dict(base_row)
@@ -68,7 +102,8 @@ def _build_rows_from_items(items):
                 "N/A" if discount_value in (None, "", "nan") else discount_value
             )
 
-            size_prices = _parse_kids_price_ranges(item.get("מחיר"))
+            kids_price_value = _get_first_value(item, ["kidsPrice", "מחיר", "price"])
+            size_prices = _parse_kids_price_ranges(kids_price_value)
             for index, (size_range, price) in enumerate(size_prices[:4], 1):
                 row[f"מידות{index}"] = size_range
                 row[f"מחיר{index}"] = price
@@ -77,7 +112,10 @@ def _build_rows_from_items(items):
         else:
             row = dict(base_row)
             row["ילדים"] = "NO"
-            row["מחיר"] = item.get("מחיר", "")
+            price_value = _get_first_value(item, ["מחיר", "price"])
+            if isinstance(price_value, dict):
+                price_value = price_value.get("regular")
+            row["מחיר"] = price_value if price_value is not None else ""
             row["הנחה"] = (
                 "nan" if discount_value in (None, "", "nan") else discount_value
             )
