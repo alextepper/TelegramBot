@@ -94,6 +94,11 @@ def _build_rows_from_items(items):
 
         is_kids = _normalize_bool(_get_first_value(item, ["ילדים", "isKids"], "NO"))
         discount_value = _get_first_value(item, ["הנחה", "discount"])
+        kids_price_value = _get_first_value(item, ["kidsPrice", "מחיר", "price"])
+        size_prices = _parse_kids_price_ranges(kids_price_value)
+
+        if size_prices and not is_kids:
+            is_kids = True
 
         if is_kids:
             row = dict(base_row)
@@ -101,9 +106,6 @@ def _build_rows_from_items(items):
             row["הנחה"] = (
                 "N/A" if discount_value in (None, "", "nan") else discount_value
             )
-
-            kids_price_value = _get_first_value(item, ["kidsPrice", "מחיר", "price"])
-            size_prices = _parse_kids_price_ranges(kids_price_value)
             for index, (size_range, price) in enumerate(size_prices[:4], 1):
                 row[f"מידות{index}"] = size_range
                 row[f"מחיר{index}"] = price
