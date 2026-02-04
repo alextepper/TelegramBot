@@ -767,44 +767,71 @@ def draw_kids_discount_price_tag(c, x_start, y_start, cell_width, cell_height, r
     thickness_x = model_x_start + c.stringWidth(color, "Montserrat-SemiBold", 18) + 5
     c.drawString(thickness_x + 0.25 * cm, color_y_position, f"{sole_thickness}mm")
 
-    # Draw the price
-    price_x = x_start + 20.5 * cm
-    try:
-        formatted_price = f"{float(price):,.2f}"
-    except ValueError:
-        formatted_price = price  # Fallback to original if conversion fails
+    # Draw kids size-price table
+    valid_size_prices = []
+    for i in range(1, 5):
+        size_column = f"מידות{i}"
+        price_column = f"מחיר{i}"
+        size_range = str(row.get(size_column, "")).strip()
+        price_value = str(row.get(price_column, "")).strip()
+        if (
+            size_range
+            and price_value
+            and size_range.lower() != "nan"
+            and price_value.lower() != "nan"
+        ):
+            valid_size_prices.append((size_range, price_value))
 
-    price_y_position = y_start + cell_height / 2
+    if valid_size_prices:
+        table_x_start = x_start + cell_width - 5.5 * cm
 
-    shekel_icon_path = "logos1/shekel.png"  # Path to your shekel symbol PNG file
-    shekel_icon_height = 0.35 * cm  # 4 mm height
-    shekel_icon_width = shekel_icon_height * 1.2  # Keep aspect ratio
+        if len(valid_size_prices) == 4:
+            table_y_start = y_start + cell_height - 0.65 * cm
+            font_size = 14
+            row_height = 0.69 * cm
+        elif len(valid_size_prices) == 3:
+            table_y_start = y_start + cell_height - 0.675 * cm
+            font_size = 16
+            row_height = 0.95 * cm
+        else:
+            table_y_start = y_start + cell_height - 1 * cm
+            font_size = 18
+            row_height = 1.2 * cm
 
-    font_size = 18
-    text_height = font_size * 0.6
+        c.setStrokeColor(colors.grey)
+        c.setDash(1, 3)
 
-    price_text_width = c.stringWidth(formatted_price, "Montserrat-SemiBold", font_size)
+        for size_range, price_value in valid_size_prices:
+            c.setFont("Poppins-Regular", font_size)
+            text_height = font_size * 0.3527
+            vertical_center_y = table_y_start - (row_height - text_height) / 2
 
-    try:
-        # Draw the shekel symbol PNG
-        c.drawImage(
-            shekel_icon_path,
-            price_x - price_text_width,
-            price_y_position - text_height / 2,  # Align vertically
-            width=shekel_icon_width,
-            height=shekel_icon_height,
-            preserveAspectRatio=True,
-            mask="auto",
-        )
+            c.drawCentredString(
+                table_x_start + 1.2 * cm, vertical_center_y + 0.1 * cm, size_range
+            )
 
-        # Draw the formatted price next to the shekel symbol
-        price_text_x = price_x + shekel_icon_width + 5  # Slight gap after icon
-        c.setFont("Montserrat-SemiBold", 18)
-        text_y_position = price_y_position - text_height / 2
-        c.drawRightString(price_text_x, text_y_position, formatted_price)
+            c.setFont("Poppins-Bold", font_size)
+            c.drawCentredString(
+                table_x_start + 4.2 * cm,
+                vertical_center_y + 0.1 * cm,
+                f"{price_value}₪",
+            )
 
-    except Exception as e:
-        print(f"Error loading shekel icon: {e}")
+            c.rect(
+                table_x_start - 0.2 * cm,
+                table_y_start - row_height / 2,
+                5.5 * cm,
+                row_height,
+            )
+
+            c.line(
+                table_x_start + 2.75 * cm,
+                table_y_start + row_height / 2,
+                table_x_start + 2.75 * cm,
+                table_y_start - row_height / 2,
+            )
+
+            table_y_start -= row_height
 
     # Draw the store logo at 21.7 cm (1.8 cm wide)
     store_logo_path = "logos1/store_logo.png"  # Path to store logo
