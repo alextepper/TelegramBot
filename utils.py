@@ -712,53 +712,31 @@ def draw_kids_discount_price_tag(c, x_start, y_start, cell_width, cell_height, r
         except Exception as e:
             print(f"Error loading brand logo: {e}")
 
-    # Draw a vertical bright green line at 4.9 cm
-    line_x = x_start + 4.9 * cm
-    c.setDash([])  # Reset dash pattern
-    c.setStrokeColorCMYK(0.38, 0.04, 1.0, 0.0)  # Bright green color
-    c.setLineWidth(1)
-    c.line(line_x, y_start + 0.65 * cm, line_x, y_start + cell_height - 0.65 * cm)
+    # Draw the background starting from 4.9 cm (kids strip)
+    strip_path = "logos1/strip.png"  # Path to kids strip background
+    try:
+        strip_x = x_start + 5 * cm
+        c.drawImage(
+            strip_path,
+            strip_x,
+            y_start + cell_height - 1.9 * cm,
+            width=cell_width - 13 * cm,  # Adjust width to fit the rest of the cell
+            height=cell_height / 2,
+            preserveAspectRatio=False,
+            mask="auto",
+        )
+    except Exception as e:
+        print(f"Error loading background image: {e}")
 
     # Draw the model name area starting from 5.6 cm
     model_x_start = x_start + 5.6 * cm
     c.setFont("Montserrat-Bold", 25)
-    c.setFillColorRGB(67 / 255, 75 / 255, 49 / 255)  # Dark green color
+    c.setFillColorRGB(1, 1, 1)
     c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
-
-    if vegan == "YES":
-        vegan_path = "logos1/VEGAN.png"  # Path to store logo
-        vegan_x = x_start + 13.7 * cm
-        try:
-            c.drawImage(
-                vegan_path,
-                vegan_x,
-                y_start + cell_height - 1.4 * cm,
-                width=2.1 * cm,
-                height=0.62 * cm,
-                preserveAspectRatio=True,
-                mask="auto",
-            )
-        except Exception as e:
-            print(f"Error loading store logo: {e}")
-
-    if grounding == "YES":
-        grounding_path = "logos1/grounding.png"  # Path to store logo
-        grounding_x = x_start + 14.7 * cm
-        try:
-            c.drawImage(
-                grounding_path,
-                grounding_x,
-                y_start + cell_height - 1.4 * cm,
-                width=2.1 * cm,
-                height=0.62 * cm,
-                preserveAspectRatio=True,
-                mask="auto",
-            )
-        except Exception as e:
-            print(f"Error loading store logo: {e}")
 
     # Draw the color and sole thickness below the model name
     c.setFont("Montserrat-SemiBold", 18)
+    c.setFillColorRGB(67 / 255, 75 / 255, 49 / 255)  # Dark green color
     color_y_position = y_start + cell_height - 2.55 * cm
     c.drawString(model_x_start, color_y_position, color)
 
@@ -766,6 +744,46 @@ def draw_kids_discount_price_tag(c, x_start, y_start, cell_width, cell_height, r
     c.setFont("Montserrat-Regular", 18)
     thickness_x = model_x_start + c.stringWidth(color, "Montserrat-SemiBold", 18) + 5
     c.drawString(thickness_x + 0.25 * cm, color_y_position, f"{sole_thickness}mm")
+
+    formatted_thickness = f"{float(sole_thickness):.1f}mm" if sole_thickness != "N/A" else "N/A"
+
+    # Calculate the x-position after the sole thickness for the icons
+    current_x_position = thickness_x + c.stringWidth(
+        formatted_thickness, "Montserrat-Regular", 18
+    )
+
+    # Draw the vegan icon if applicable
+    if vegan == "YES":
+        vegan_path = "logos1/VEGAN.png"  # Path to vegan logo
+        try:
+            c.drawImage(
+                vegan_path,
+                current_x_position,
+                color_y_position,  # Align vertically (slightly below the text)
+                width=2.1 * cm,
+                height=0.75 * cm,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+            current_x_position += 0.66 * cm + 0.4 * cm
+        except Exception as e:
+            print(f"Error loading vegan icon: {e}")
+
+    # Draw the grounding icon if applicable
+    if grounding == "YES":
+        grounding_path = "logos1/GROUNDING.png"  # Path to grounding logo
+        try:
+            c.drawImage(
+                grounding_path,
+                current_x_position,
+                color_y_position,  # Align vertically (slightly below the text)
+                width=2.1 * cm,
+                height=0.75 * cm,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+        except Exception as e:
+            print(f"Error loading grounding icon: {e}")
 
     # Draw kids size-price table
     valid_size_prices = []
@@ -833,16 +851,16 @@ def draw_kids_discount_price_tag(c, x_start, y_start, cell_width, cell_height, r
 
             table_y_start -= row_height
 
-    # Draw the store logo at 21.7 cm (1.8 cm wide)
-    store_logo_path = "logos1/store_logo.png"  # Path to store logo
+    # Draw the store logo at 21.7 cm (kids)
+    store_logo_path = "logos1/store_logo_kids.png"  # Path to store logo
     store_logo_x = x_start + 21.7 * cm
     try:
         c.drawImage(
             store_logo_path,
             store_logo_x,
-            y_start + (cell_height - 2.1 * cm) / 2,
+            y_start + (cell_height - 3 * cm) / 2,
             width=2.1 * cm,
-            height=2.1 * cm,
+            height=3 * cm,
             preserveAspectRatio=True,
             mask="auto",
         )
