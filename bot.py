@@ -442,8 +442,9 @@ def generate_mixed_pdf(rows):
         if is_kids:
             draw_kids_price_tag(c, x_start, y_start, cell_width, cell_height, row)
         else:
-            discount = str(row.get("הנחה", "0"))
-            if discount == "0":
+            discount_value = row.get("הנחה", "0")
+            discount_text = str(discount_value).strip()
+            if discount_value == 0 or discount_text == "0":
                 draw_price_tag(c, x_start, y_start, cell_width, cell_height, row)
             else:
                 draw_discount_price_tag(
