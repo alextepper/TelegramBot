@@ -217,7 +217,11 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     color = str(row.get("צבע", "N/A")).upper()
     price = str(row.get("מחיר", "N/A"))
     brand_name = str(row.get("מותג"))
-    discount = str(int(row.get("הנחה")))
+    discount_value = row.get("הנחה", 0)
+    try:
+        discount = str(int(float(discount_value)))
+    except (TypeError, ValueError):
+        discount = "0"
     sole_thickness_value = row.get("עובי", "N/A")
     vegan = str(row.get("טבעוני", "N/A")).upper()
     grounding = str(row.get("הארקה", "N/A")).upper()
