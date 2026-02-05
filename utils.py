@@ -30,6 +30,10 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     :param cell_height: The height of the cell.
     :param row: The row data containing model, color, price, etc.
     """
+    print(
+        "draw_price_tag_called",
+        {"model": row.get("דגם"), "brand": row.get("מותג"), "price": row.get("מחיר")},
+    )
     # Extract the row data
     model_name = str(row.get("דגם", "N/A")).upper()
     color = str(row.get("צבע", "N/A")).upper()
@@ -213,6 +217,14 @@ def draw_discount_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     :param cell_height: The height of the cell.
     :param row: The row data containing model, color, price, etc.
     """
+    print(
+        "draw_discount_price_tag_called",
+        {
+            "model": row.get("דגם"),
+            "brand": row.get("מותג"),
+            "discount": row.get("הנחה"),
+        },
+    )
     model_name = str(row.get("דגם", "N/A")).upper()
     color = str(row.get("צבע", "N/A")).upper()
     price = str(row.get("מחיר", "N/A"))
@@ -429,7 +441,16 @@ def draw_kids_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     :param row: The row data containing model, color, price, etc.
     """
     # Extract the row data
-    print("used draw kids_price_tag")
+    print(
+        "draw_kids_price_tag_called",
+        {
+            "model": row.get("דגם"),
+            "brand": row.get("מותג"),
+            "size_ranges": [
+                (row.get(f"מידות{i}"), row.get(f"מחיר{i}")) for i in range(1, 5)
+            ],
+        },
+    )
     model_name = str(row.get("דגם", "N/A")).upper()
     color = str(row.get("צבע", "N/A")).upper()
     price = str(row.get("מחיר", "N/A"))
@@ -680,6 +701,17 @@ def draw_kids_discount_price_tag(c, x_start, y_start, cell_width, cell_height, r
     :param row: The row data containing model, color, price, etc.
     """
     # Extract the row data
+    print(
+        "draw_kids_discount_price_tag_called",
+        {
+            "model": row.get("דגם"),
+            "brand": row.get("מותג"),
+            "discount": row.get("הנחה"),
+            "size_ranges": [
+                (row.get(f"מידות{i}"), row.get(f"מחיר{i}")) for i in range(1, 5)
+            ],
+        },
+    )
     model_name = str(row.get("דגם", "N/A")).upper()
     color = str(row.get("צבע", "N/A")).upper()
     price = str(row.get("מחיר", "N/A"))
