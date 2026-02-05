@@ -71,26 +71,17 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
         except Exception as e:
             print(f"Error loading brand logo: {e}")
 
-    # Draw the kids strip background
-    strip_path = "logos1/strip.png"  # Path to kids strip background
-    try:
-        strip_x = x_start + 5 * cm
-        c.drawImage(
-            strip_path,
-            strip_x,
-            y_start + cell_height - 1.9 * cm,
-            width=cell_width - 13 * cm,  # Adjust width to fit the rest of the cell
-            height=cell_height / 2,
-            preserveAspectRatio=False,
-            mask="auto",
-        )
-    except Exception as e:
-        print(f"Error loading background image: {e}")
+    # Draw a vertical bright green line at 4.9 cm
+    line_x = x_start + 4.9 * cm
+    c.setDash([])  # Reset dash pattern
+    c.setStrokeColorCMYK(0.38, 0.04, 1.0, 0.0)  # Bright green color
+    c.setLineWidth(1)
+    c.line(line_x, y_start + 0.65 * cm, line_x, y_start + cell_height - 0.65 * cm)
 
     # Draw the model name area starting from 5.6 cm
     model_x_start = x_start + 5.6 * cm
     c.setFont("Montserrat-Bold", 25)
-    c.setFillColorRGB(1, 1, 1)
+    c.setFillColorRGB(67 / 255, 75 / 255, 49 / 255)  # Dark green color
     c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
 
     c.setFont("Montserrat-SemiBold", 18)
@@ -190,15 +181,15 @@ def draw_price_tag(c, x_start, y_start, cell_width, cell_height, row):
         print(f"Error loading shekel icon: {e}")
 
     # Draw the store logo at 21.7 cm (1.8 cm wide)
-    store_logo_path = "logos1/store_logo_kids.png"  # Path to store logo
+    store_logo_path = "logos1/store_logo.png"  # Path to store logo
     store_logo_x = x_start + 21.7 * cm
     try:
         c.drawImage(
             store_logo_path,
             store_logo_x,
-            y_start + (cell_height - 3 * cm) / 2,
+            y_start + (cell_height - 2.1 * cm) / 2,
             width=2.1 * cm,
-            height=3 * cm,
+            height=2.1 * cm,
             preserveAspectRatio=True,
             mask="auto",
         )
