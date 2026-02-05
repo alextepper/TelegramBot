@@ -456,15 +456,28 @@ def generate_mixed_pdf(rows):
 
         # Treat as kids only when size ranges exist or explicitly marked as kids.
         is_kids = has_size_prices or is_kids_flag
+        print(
+            "template_decision",
+            {
+                "model": row.get("דגם"),
+                "brand": row.get("מותג"),
+                "is_kids_flag": is_kids_flag,
+                "has_size_prices": has_size_prices,
+                "is_kids_final": is_kids,
+            },
+        )
 
         if is_kids and has_size_prices:
+            print("template_selected", "kids")
             draw_kids_price_tag(c, x_start, y_start, cell_width, cell_height, row)
         else:
             discount_value = row.get("הנחה", None)
             discount_text = str(discount_value).strip().lower()
             if discount_value in (None, "") or discount_text in ("0", "0.0", "nan"):
+                print("template_selected", "adult_regular")
                 draw_price_tag(c, x_start, y_start, cell_width, cell_height, row)
             else:
+                print("template_selected", "adult_discount")
                 draw_discount_price_tag(
                     c, x_start, y_start, cell_width, cell_height, row
                 )
