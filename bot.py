@@ -438,8 +438,26 @@ def generate_mixed_pdf(rows):
         # Reset the line settings for the rest of the content
         c.setDash([])
 
-        is_kids = str(row.get("ילדים", "NO")).strip().lower() in ["yes", "true", "1"]
-        if is_kids:
+        is_kids_flag = (
+            str(row.get("ילדים", "NO")).strip().lower() in ["yes", "true", "1"]
+        )
+        has_size_prices = False
+        for i in range(1, 5):
+            size_value = str(row.get(f"מידות{i}", "")).strip().lower()
+            price_value = str(row.get(f"מחיר{i}", "")).strip().lower()
+            if (
+                size_value
+                and price_value
+                and size_value != "nan"
+                and price_value != "nan"
+            ):
+                has_size_prices = True
+                break
+
+        # Treat as kids only when size ranges exist or explicitly marked as kids.
+        is_kids = has_size_prices or is_kids_flag
+
+        if is_kids and has_size_prices:
             draw_kids_price_tag(c, x_start, y_start, cell_width, cell_height, row)
         else:
             discount_value = row.get("הנחה", None)
