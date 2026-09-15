@@ -924,8 +924,8 @@ def _format_custom_price(price_value):
 
 def draw_custom_combo_price_tag(c, x_start, y_start, cell_width, cell_height, row):
     """
-    Draw a custom combo shelf strip — same layout as kids multi-price tags
-    (strip.png title band, meta row, price table) with label / price / discount columns.
+    Draw a custom combo shelf strip — adult-style header (no ribbon) with a compact
+    three-column label / price / discount table.
     """
     print(
         "draw_custom_combo_price_tag_called",
@@ -974,24 +974,15 @@ def draw_custom_combo_price_tag(c, x_start, y_start, cell_width, cell_height, ro
         except Exception as e:
             print(f"Error loading brand logo: {e}")
 
-    strip_path = "logos1/strip.png"
-    try:
-        strip_x = x_start + 5 * cm
-        c.drawImage(
-            strip_path,
-            strip_x,
-            y_start + cell_height - 1.9 * cm,
-            width=cell_width - 13 * cm,
-            height=cell_height / 2,
-            preserveAspectRatio=False,
-            mask="auto",
-        )
-    except Exception as e:
-        print(f"Error loading strip background: {e}")
+    line_x = x_start + 4.9 * cm
+    c.setDash([])
+    c.setStrokeColorCMYK(0.38, 0.04, 1.0, 0.0)
+    c.setLineWidth(1)
+    c.line(line_x, y_start + 0.65 * cm, line_x, y_start + cell_height - 0.65 * cm)
 
     model_x_start = x_start + 5.6 * cm
     c.setFont("Montserrat-Bold", 25)
-    c.setFillColorRGB(1, 1, 1)
+    c.setFillColorRGB(67 / 255, 75 / 255, 49 / 255)
     c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
 
     c.setFont("Montserrat-SemiBold", 18)
@@ -1057,25 +1048,25 @@ def draw_custom_combo_price_tag(c, x_start, y_start, cell_width, cell_height, ro
             valid_rows.append((label, price, discount))
 
     if valid_rows:
-        table_x_start = x_start + cell_width - 8.5 * cm
-        col1_center = table_x_start + 1.05 * cm
-        col2_center = table_x_start + 3.25 * cm
-        col3_center = table_x_start + 5.45 * cm
-        divider1_x = table_x_start + 2.1 * cm
-        divider2_x = table_x_start + 4.4 * cm
+        table_x_start = x_start + cell_width - 7.2 * cm
+        col1_center = table_x_start + 0.85 * cm
+        col2_center = table_x_start + 2.75 * cm
+        col3_center = table_x_start + 4.65 * cm
+        divider1_x = table_x_start + 1.65 * cm
+        divider2_x = table_x_start + 3.55 * cm
 
         if len(valid_rows) == 4:
-            table_y_start = y_start + cell_height - 0.65 * cm
-            font_size = 14
-            row_height = 0.69 * cm
+            table_y_start = y_start + cell_height - 0.7 * cm
+            font_size = 12
+            row_height = 0.62 * cm
         elif len(valid_rows) == 3:
-            table_y_start = y_start + cell_height - 0.675 * cm
-            font_size = 16
-            row_height = 0.95 * cm
+            table_y_start = y_start + cell_height - 0.72 * cm
+            font_size = 14
+            row_height = 0.85 * cm
         else:
-            table_y_start = y_start + cell_height - 1 * cm
-            font_size = 18
-            row_height = 1.2 * cm
+            table_y_start = y_start + cell_height - 0.95 * cm
+            font_size = 16
+            row_height = 1.05 * cm
 
         c.setStrokeColor(colors.grey)
         c.setDash(1, 3)
@@ -1126,15 +1117,15 @@ def draw_custom_combo_price_tag(c, x_start, y_start, cell_width, cell_height, ro
         )
         c.setDash([])
 
-    store_logo_path = "logos1/store_logo_kids.png"
+    store_logo_path = "logos1/store_logo.png"
     store_logo_x = x_start + 21.7 * cm
     try:
         c.drawImage(
             store_logo_path,
             store_logo_x,
-            y_start + (cell_height - 3 * cm) / 2,
+            y_start + (cell_height - 2.1 * cm) / 2,
             width=2.1 * cm,
-            height=3 * cm,
+            height=2.1 * cm,
             preserveAspectRatio=True,
             mask="auto",
         )
