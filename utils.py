@@ -1048,25 +1048,27 @@ def draw_custom_combo_price_tag(c, x_start, y_start, cell_width, cell_height, ro
             valid_rows.append((label, price, discount))
 
     if valid_rows:
-        table_x_start = x_start + cell_width - 7.2 * cm
-        col1_center = table_x_start + 0.85 * cm
-        col2_center = table_x_start + 2.75 * cm
-        col3_center = table_x_start + 4.65 * cm
-        divider1_x = table_x_start + 1.65 * cm
-        divider2_x = table_x_start + 3.55 * cm
+        # Keep the table clear of the store logo at 21.7 cm (2.1 cm wide).
+        table_width = 4.5 * cm
+        table_x_start = x_start + 21.4 * cm - table_width
+        col1_center = table_x_start + 0.75 * cm
+        col2_center = table_x_start + 2.25 * cm
+        col3_center = table_x_start + 3.75 * cm
+        divider1_x = table_x_start + 1.5 * cm
+        divider2_x = table_x_start + 3.0 * cm
 
         if len(valid_rows) == 4:
-            table_y_start = y_start + cell_height - 0.7 * cm
-            font_size = 12
-            row_height = 0.62 * cm
-        elif len(valid_rows) == 3:
             table_y_start = y_start + cell_height - 0.72 * cm
-            font_size = 14
-            row_height = 0.85 * cm
+            font_size = 10
+            row_height = 0.58 * cm
+        elif len(valid_rows) == 3:
+            table_y_start = y_start + cell_height - 0.74 * cm
+            font_size = 11
+            row_height = 0.78 * cm
         else:
-            table_y_start = y_start + cell_height - 0.95 * cm
-            font_size = 16
-            row_height = 1.05 * cm
+            table_y_start = y_start + cell_height - 0.98 * cm
+            font_size = 13
+            row_height = 0.98 * cm
 
         c.setStrokeColor(colors.grey)
         c.setDash(1, 3)
