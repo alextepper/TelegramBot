@@ -65,10 +65,70 @@ def _parse_kids_price_ranges(price_value):
     return size_prices
 
 
+def _normalize_custom_combo_rows(rows_value):
+    normalized = []
+    if not isinstance(rows_value, list):
+        return normalized
+    for row in rows_value:
+        if not isinstance(row, dict):
+            continue
+        label = str(row.get("label", "")).strip()
+        price = str(row.get("price", "")).strip()
+        discount = str(row.get("discount", "")).strip()
+        if label or price or discount:
+            normalized.append((label, price, discount))
+    return normalized
+
+
+def _build_custom_combo_row(item):
+    base_row = {
+        "דגם": _normalize_str(
+            _get_first_value(item, ["דגם", "printTitle", "title"])
+        ),
+        "מותג": _normalize_str(_get_first_value(item, ["מותג", "make"])),
+        "צבע": _normalize_str(_get_first_value(item, ["צבע", "color"])),
+        "עובי": _normalize_str(_get_first_value(item, ["עובי", "thickness"])),
+        "טבעוני": (
+            "YES"
+            if _normalize_bool(_get_first_value(item, ["טבעוני", "isVegan"], False))
+            else "NO"
+        ),
+        "הארקה": (
+            "YES"
+            if _normalize_bool(
+                _get_first_value(item, ["הארקה", "isGrounded"], False)
+            )
+            else "NO"
+        ),
+        "סוג": "custom_combo",
+    }
+
+    combo_rows = _normalize_custom_combo_rows(item.get("rows"))
+    for index, (label, price, discount) in enumerate(combo_rows[:4], 1):
+        base_row[f"תווית{index}"] = label
+        base_row[f"מחיר{index}"] = price
+        base_row[f"הנחה{index}"] = discount
+
+    return base_row
+
+
+def _is_custom_combo_item(item):
+    tag_type = str(_get_first_value(item, ["tagType", "סוג"], "") or "").strip()
+    if tag_type == "customCombo":
+        return True
+    if _normalize_bool(_get_first_value(item, ["isCustom"], False)):
+        return isinstance(item.get("rows"), list)
+    return False
+
+
 def _build_rows_from_items(items):
     rows = []
     for item in items:
         if not isinstance(item, dict):
+            continue
+
+        if _is_custom_combo_item(item):
+            rows.append(_build_custom_combo_row(item))
             continue
 
         base_row = {
