@@ -893,3 +893,250 @@ def draw_kids_discount_price_tag(c, x_start, y_start, cell_width, cell_height, r
         )
     except Exception as e:
         print(f"Error loading store logo: {e}")
+
+
+def _format_custom_discount(discount_value):
+    raw = str(discount_value or "").strip()
+    if not raw or raw.lower() == "nan":
+        return ""
+    if "%" in raw:
+        return raw if raw.startswith("-") else f"-{raw.lstrip('-')}"
+    try:
+        return f"-{int(float(raw))}%"
+    except (TypeError, ValueError):
+        return raw
+
+
+def _format_custom_price(price_value):
+    raw = str(price_value or "").strip()
+    if not raw or raw.lower() == "nan":
+        return ""
+    if "₪" in raw:
+        return raw
+    try:
+        num = float(raw)
+        if num.is_integer():
+            return f"{int(num)}₪"
+        return f"{num}₪"
+    except (TypeError, ValueError):
+        return f"{raw}₪"
+
+
+def draw_custom_combo_price_tag(c, x_start, y_start, cell_width, cell_height, row):
+    """
+    Draw a custom combo shelf strip — same layout as kids multi-price tags
+    (strip.png title band, meta row, price table) with label / price / discount columns.
+    """
+    print(
+        "draw_custom_combo_price_tag_called",
+        {
+            "model": row.get("דגם"),
+            "brand": row.get("מותג"),
+            "rows": [
+                (
+                    row.get(f"תווית{i}"),
+                    row.get(f"מחיר{i}"),
+                    row.get(f"הנחה{i}"),
+                )
+                for i in range(1, 5)
+            ],
+        },
+    )
+
+    model_name = str(row.get("דגם", "N/A")).upper()
+    color = str(row.get("צבע", "N/A")).upper()
+    brand_name = str(row.get("מותג"))
+    sole_thickness_value = row.get("עובי", "N/A")
+    vegan = str(row.get("טבעוני", "N/A")).upper()
+    grounding = str(row.get("הארקה", "N/A")).upper()
+
+    try:
+        sole_thickness = f"{float(sole_thickness_value):.1f}"
+    except (ValueError, TypeError):
+        sole_thickness = "N/A"
+
+    brand_logo_path = f"logos1/{brand_name}.png" if brand_name else None
+    if brand_logo_path and os.path.exists(brand_logo_path):
+        try:
+            max_logo_width = 4.2 * cm
+            max_logo_height = cell_height - 0.6 * cm
+            logo_x = x_start + (4.9 * cm - max_logo_width) / 2
+            logo_y = y_start + (cell_height - max_logo_height) / 2
+            c.drawImage(
+                brand_logo_path,
+                logo_x,
+                logo_y,
+                width=max_logo_width,
+                height=max_logo_height,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+        except Exception as e:
+            print(f"Error loading brand logo: {e}")
+
+    strip_path = "logos1/strip.png"
+    try:
+        strip_x = x_start + 5 * cm
+        c.drawImage(
+            strip_path,
+            strip_x,
+            y_start + cell_height - 1.9 * cm,
+            width=cell_width - 13 * cm,
+            height=cell_height / 2,
+            preserveAspectRatio=False,
+            mask="auto",
+        )
+    except Exception as e:
+        print(f"Error loading strip background: {e}")
+
+    model_x_start = x_start + 5.6 * cm
+    c.setFont("Montserrat-Bold", 25)
+    c.setFillColorRGB(1, 1, 1)
+    c.drawString(model_x_start, y_start + cell_height - 1.4 * cm, model_name)
+
+    c.setFont("Montserrat-SemiBold", 18)
+    c.setFillColorRGB(67 / 255, 75 / 255, 49 / 255)
+    color_y_position = y_start + cell_height - 2.55 * cm
+    c.drawString(model_x_start, color_y_position, color)
+
+    c.setFont("Montserrat-Regular", 18)
+    thickness_x = model_x_start + c.stringWidth(color, "Montserrat-SemiBold", 18) + 5
+    formatted_thickness = (
+        f"{float(sole_thickness):.1f}mm"
+        if sole_thickness != "N/A"
+        else "N/A"
+    )
+    c.drawString(thickness_x + 0.25 * cm, color_y_position, formatted_thickness)
+
+    current_x_position = thickness_x + c.stringWidth(
+        formatted_thickness, "Montserrat-Regular", 18
+    )
+
+    if vegan == "YES":
+        vegan_path = "logos1/VEGAN.png"
+        try:
+            c.drawImage(
+                vegan_path,
+                current_x_position,
+                color_y_position,
+                width=2.1 * cm,
+                height=0.75 * cm,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+            current_x_position += 0.66 * cm + 0.4 * cm
+        except Exception as e:
+            print(f"Error loading vegan icon: {e}")
+
+    if grounding == "YES":
+        grounding_path = "logos1/GROUNDING.png"
+        try:
+            c.drawImage(
+                grounding_path,
+                current_x_position,
+                color_y_position,
+                width=2.1 * cm,
+                height=0.75 * cm,
+                preserveAspectRatio=True,
+                mask="auto",
+            )
+        except Exception as e:
+            print(f"Error loading grounding icon: {e}")
+
+    valid_rows = []
+    for i in range(1, 5):
+        label = str(row.get(f"תווית{i}", "")).strip()
+        price = str(row.get(f"מחיר{i}", "")).strip()
+        discount = str(row.get(f"הנחה{i}", "")).strip()
+        if (
+            label
+            and price
+            and label.lower() != "nan"
+            and price.lower() != "nan"
+        ):
+            valid_rows.append((label, price, discount))
+
+    if valid_rows:
+        table_x_start = x_start + cell_width - 8.5 * cm
+        col1_center = table_x_start + 1.05 * cm
+        col2_center = table_x_start + 3.25 * cm
+        col3_center = table_x_start + 5.45 * cm
+        divider1_x = table_x_start + 2.1 * cm
+        divider2_x = table_x_start + 4.4 * cm
+
+        if len(valid_rows) == 4:
+            table_y_start = y_start + cell_height - 0.65 * cm
+            font_size = 14
+            row_height = 0.69 * cm
+        elif len(valid_rows) == 3:
+            table_y_start = y_start + cell_height - 0.675 * cm
+            font_size = 16
+            row_height = 0.95 * cm
+        else:
+            table_y_start = y_start + cell_height - 1 * cm
+            font_size = 18
+            row_height = 1.2 * cm
+
+        c.setStrokeColor(colors.grey)
+        c.setDash(1, 3)
+
+        for label, price_value, discount_value in valid_rows:
+            text_height = font_size * 0.3527
+            vertical_center_y = table_y_start - (row_height - text_height) / 2
+
+            c.setFont("Montserrat-Regular", font_size)
+            c.setFillColorRGB(67 / 255, 75 / 255, 49 / 255)
+            c.drawCentredString(
+                col1_center, vertical_center_y + 0.1 * cm, label
+            )
+
+            c.setFont("Montserrat-Bold", font_size)
+            c.drawCentredString(
+                col2_center,
+                vertical_center_y + 0.1 * cm,
+                _format_custom_price(price_value),
+            )
+
+            discount_text = _format_custom_discount(discount_value)
+            if discount_text:
+                c.setFont("Montserrat-Bold", font_size)
+                c.setFillColorCMYK(0.38, 0.04, 1.0, 0.0)
+                c.drawCentredString(
+                    col3_center,
+                    vertical_center_y + 0.1 * cm,
+                    discount_text,
+                )
+
+            table_y_start -= row_height
+
+        c.setDash([])
+        c.setStrokeColorCMYK(0.38, 0.04, 1.0, 0.0)
+        c.setLineWidth(1)
+        c.line(
+            divider1_x,
+            y_start + 0.65 * cm,
+            divider1_x,
+            y_start + cell_height - 0.65 * cm,
+        )
+        c.line(
+            divider2_x,
+            y_start + 0.65 * cm,
+            divider2_x,
+            y_start + cell_height - 0.65 * cm,
+        )
+        c.setDash([])
+
+    store_logo_path = "logos1/store_logo_kids.png"
+    store_logo_x = x_start + 21.7 * cm
+    try:
+        c.drawImage(
+            store_logo_path,
+            store_logo_x,
+            y_start + (cell_height - 3 * cm) / 2,
+            width=2.1 * cm,
+            height=3 * cm,
+            preserveAspectRatio=True,
+            mask="auto",
+        )
+    except Exception as e:
+        print(f"Error loading store logo: {e}")

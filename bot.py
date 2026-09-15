@@ -11,6 +11,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 from utils import (
+    draw_custom_combo_price_tag,
     draw_kids_discount_price_tag,
     draw_kids_price_tag,
     draw_price_tag,
@@ -437,6 +438,21 @@ def generate_mixed_pdf(rows):
 
         # Reset the line settings for the rest of the content
         c.setDash([])
+
+        if str(row.get("סוג", "")).strip() == "custom_combo":
+            print("template_selected", "custom_combo")
+            draw_custom_combo_price_tag(
+                c, x_start, y_start, cell_width, cell_height, row
+            )
+            x_start += cell_width
+            if x_start + cell_width > height - 1 * cm:
+                x_start = 1 * cm
+                y_start -= cell_height
+            if y_start < 1 * cm:
+                c.showPage()
+                x_start = 1 * cm
+                y_start = width - cell_height - 1 * cm
+            continue
 
         is_kids_flag = (
             str(row.get("ילדים", "NO")).strip().lower() in ["yes", "true", "1"]
