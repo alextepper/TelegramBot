@@ -1048,14 +1048,14 @@ def draw_custom_combo_price_tag(c, x_start, y_start, cell_width, cell_height, ro
             valid_rows.append((label, price, discount))
 
     if valid_rows:
-        # Keep the table clear of the store logo at 21.7 cm (2.1 cm wide).
-        table_width = 4.5 * cm
-        table_x_start = x_start + 21.4 * cm - table_width
-        col1_center = table_x_start + 0.75 * cm
-        col2_center = table_x_start + 2.25 * cm
-        col3_center = table_x_start + 3.75 * cm
-        divider1_x = table_x_start + 1.5 * cm
-        divider2_x = table_x_start + 3.0 * cm
+        # End table at 21.0 cm — leaves gap before store logo at 21.7 cm.
+        table_width = 5.0 * cm
+        table_x_start = x_start + 21.0 * cm - table_width
+        col1_center = table_x_start + 0.7 * cm
+        col2_center = table_x_start + 2.4 * cm
+        col3_center = table_x_start + 4.0 * cm
+        divider1_x = table_x_start + 1.4 * cm
+        divider2_x = table_x_start + 3.3 * cm
 
         if len(valid_rows) == 4:
             table_y_start = y_start + cell_height - 0.72 * cm
